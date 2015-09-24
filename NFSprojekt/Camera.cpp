@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include <math.h>
+#include <cmath>
 #include <stdio.h>
 #include "GraphicalObject.h"
 
@@ -17,8 +17,8 @@ Camera::Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 axis)
 	this->yaw = 0;
 
 	this->setPerspective(90.0,
-		(GLfloat) GraphicalEngine::Instance->resolution.Width
-		/ GraphicalEngine::Instance->resolution.Height, 1, 50);
+		(GLfloat) Engine::Instance->resolution.Width
+		/ Engine::Instance->resolution.Height, 1, 50);
 	this->setupCamera();
 }
 

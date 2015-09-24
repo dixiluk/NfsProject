@@ -1,13 +1,7 @@
 #include "ModelObject.h"
 
-char* addChar(char* base, char* source){
-	char* ret = (char*) malloc(strlen(base) + strlen(source) + 1);
-	strcpy(ret, base);
-	strcat(ret, source);
-	return ret;
-}
 
-void ModelObject::computeTangents(){
+void ModelObject::computeTangents(){		// tworzenie tg i ctg dla kazdego wierzcholka
 	int x;
 	for (int i = 0; i<this->verticesCount; i += 3){
 		x = i + 0;
@@ -45,7 +39,7 @@ void ModelObject::computeTangents(){
 	}
 }
 
-void ModelObject::createArrayBuffer()
+void ModelObject::createArrayBuffer()		//Dodawanie wierzcholka do pamieci OpenGl
 {
 	GLuint  vertexLoc = 0, normalLoc = 1, texCoordLoc = 2, tangentLoc = 3, bitangentLoc = 4;
 
@@ -156,119 +150,6 @@ void ModelObject::extractMesh(FbxNode* node){
 	}
 }
 
-void ModelObject::extractBones(FbxNode* node){
-	FbxMesh* pMesh = node->GetMesh();
-	FbxVector4* pVertices = pMesh->GetControlPoints();
-	this->aI = new GLfloat[pMesh->GetPolygonCount() * 12];
-	this->aW = new GLfloat[pMesh->GetPolygonCount() * 12];
-
-	if (!pMesh->GetDeformerCount())
-		return;
-
-	FbxDeformer *pDef = pMesh->GetDeformer(0);
-
-	FbxDeformer::EDeformerType defType = pDef->GetDeformerType();
-
-	FbxSkin *pSkin = reinterpret_cast<FbxSkin*>(pMesh->GetDeformer(0, FbxDeformer::eSkin));
-	int clusterCount = pSkin->GetClusterCount();
-
-	this->armature = new Armature();
-	for (int i = 0; i < clusterCount; i++)
-	{
-		FbxCluster *pCluster = pSkin->GetCluster(i);
-
-		FbxCluster *pChildCluster;
-		FbxCluster::ELinkMode lClusterMode = pCluster->GetLinkMode();
-
-		FbxAMatrix kLinkMatrix;
-		pCluster->GetTransformLinkMatrix(kLinkMatrix);
-
-		FbxNode* parent = pCluster->GetLink()->GetParent();
-
-		//FbxNode* childs = pCluster->GetLink()->GetParent();
-
-
-		printf("-%s- \n", pCluster->GetName());
-		Bone* bone;
-		if ((bone = armature->getBone(pCluster->GetName())) == NULL)
-			bone = new Bone(pCluster->GetName());
-
-
-		if (parent != NULL){
-
-			if (strcmp(parent->GetName(), "Armature") == 0){
-				bone->parent = NULL;
-				armature->parentBone = bone;
-			}
-			else
-			{
-				char* name1 = strtok(strdup(parent->GetName()), "|");
-				char* name = strtok(NULL, "|");
-				if (name == NULL) name = name1;
-				bone->parent = armature->getBone(name);
-				if (bone->parent == NULL) {
-					bone->parent = new Bone(name);
-					armature->addBone(bone->parent);
-				}
-			}
-		}
-		else bone->parent = NULL;
-
-		Bone* child;
-		bone->childCount = pCluster->GetLink()->GetChildCount();
-		printf("count: %d\n", bone->childCount);
-		bone->childs = new Bone*[pCluster->GetLink()->GetChildCount()];
-		for (int ix = 0; ix < pCluster->GetLink()->GetChildCount(); ix++){
-			pChildCluster = (FbxCluster*) pCluster->GetLink()->GetChild(i);
-
-			char* name1 = strtok(strdup(pChildCluster->GetName()), "|");
-			name = strtok(NULL, "|");
-			if (name == NULL) name = name1;
-
-			printf("Adding child: %s \n", name);
-			if ((child = armature->getBone(name)) != NULL)
-				bone->childs[ix] = child;
-			else{
-				bone->childs[ix] = new Bone(name);
-				armature->addBone(bone->childs[ix]);
-			}
-		}
-
-
-		glm::mat4 s;
-		for (int x = 0; x < 4; x++)
-		for (int y = 0; y < 4; y++)
-			s[x][y] = kLinkMatrix.mData[x][y];
-		printf("%f %f %f\n", s[3][0], s[3][1], s[3][2]);
-
-		bone->bindPoseMatrix = s;
-		bone->boneMatrix = glm::mat4(1.0f);
-		bone->id = i;
-
-		armature->addBone(bone);
-
-		int indexCount = pCluster->GetControlPointIndicesCount();
-		int *indices = pCluster->GetControlPointIndices();
-		double *weights = pCluster->GetControlPointWeights();
-
-		FbxVector4 vec;
-		for (int j = 0; j < indexCount; j++)
-		{
-			vec = pVertices[indices[j]];
-			for (int l = 0; l < this->verticesCount; l++){
-				if (this->v[l * 3 + 0] == vec.mData[0] &&
-					this->v[l * 3 + 1] == vec.mData[1] &&
-					this->v[l * 3 + 2] == vec.mData[2])
-				{
-					this->aI[l * 4 + j] = i;
-					this->aW[l * 4 + j] = (double) weights[j];
-				}
-			}
-		}
-	}
-	//armature->updateRotationArray();
-}
-
 ModelObject::ModelObject(FbxNode* node)
 {
 	bool Animation = false;
@@ -276,9 +157,9 @@ ModelObject::ModelObject(FbxNode* node)
 	this->name = node->GetName();
 
 	//this->ambientoccMap = new Texture(addChar(TEXTURES_SUBDIR, addChar((char*)this->name, "_OCC.png")));
-	this->diffuseMap = new Texture(addChar(TEXTURES_SUBDIR, addChar((char*)this->name, "_COLOR.png")));
+	this->diffuseMap = new Texture((std::string(TEXTURES_SUBDIR) + std::string(this->name) + "_COLOR.png").c_str());
 	//this->specularMap = new Texture(addChar(TEXTURES_SUBDIR, addChar((char*)this->name, "_SPEC.png")));
-	this->normalMap = new Texture(addChar(TEXTURES_SUBDIR, addChar((char*)this->name, "_NRM.png")));
+	this->normalMap = new Texture((std::string(TEXTURES_SUBDIR) + std::string(this->name) + "_NRM.png").c_str());
 
 	FbxDouble3 pos = node->LclTranslation.Get();
 	this->relativePosition.x = pos.mData[0];
@@ -286,7 +167,6 @@ ModelObject::ModelObject(FbxNode* node)
 	this->relativePosition.z = pos.mData[2];
 
 	this->extractMesh(node);
-	//this->extractBones(node);
 	this->computeTangents();
 	this->createArrayBuffer();
 }

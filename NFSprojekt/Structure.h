@@ -1,14 +1,12 @@
 #pragma once
-#include "Model.h"
 #include "StaticObject.h"
 
 class Structure : public StaticObject
 {
 public:
 	static std::list<Structure*> Structures;
-	Structure();
+	Structure(glm::vec3 position, Model* model, Shader* shader);
 	~Structure();
-	Model* model;
 	glm::mat4 iModelMat;
 protected:
 	void draw(Shader* shad = 0);

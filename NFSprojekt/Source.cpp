@@ -4,6 +4,7 @@
 #include "Environment.h"
 #include "Camera.h"
 #include "ModelObject.h"
+#include "StructureShader.h"
 
 int main(int argc, char * argv[])
 {
@@ -13,7 +14,13 @@ int main(int argc, char * argv[])
 
 	Scene* scene = new Scene();
 
+	scene->addGraphicalObject(new Structure(glm::vec3(0, 0, 0), new Model("Audi-TT.fbx"), new StructureShader()));
+
 	Engine::Instance->activeScene = (Scene*)scene;
+
+	Camera *camera = new Camera(glm::vec3(0,4,0));
+
+	camera->setActive();
 
 	glutMainLoop();
 

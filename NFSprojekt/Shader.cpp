@@ -9,7 +9,9 @@ Shader::Shader(char* vsFileName, char* psFileName)
 	strcpy(path1, SHADERS_SUBDIR);
 	strcat(path1, vsFileName);
 	FILE* file = fopen(path1, "r");
-	if (file == NULL);
+	char* str = strerror(errno);
+
+	if (file == NULL)
 		TriggerCrash("Could not found shader file");
 
 	fseek(file, 0, SEEK_END);
@@ -25,7 +27,7 @@ Shader::Shader(char* vsFileName, char* psFileName)
 	strcpy(path2, SHADERS_SUBDIR);
 	strcat(path2, psFileName);
 	file = fopen(path2, "r");
-	if (file == NULL);
+	if (file == NULL)
 		TriggerCrash("Could not found shader file");
 	fseek(file, 0, SEEK_END);
 	flen = ftell(file);
@@ -53,7 +55,6 @@ Shader::Shader(char* vsFileName, char* psFileName)
 	printf(log);
 	glGetShaderInfoLog(pixelShader, 1024, &len, log);
 	printf(log);
-
 	// Create Shader And Program Objects
 	program = glCreateProgram();
 

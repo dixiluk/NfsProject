@@ -3,12 +3,13 @@
 #include <GL/freeglut.h>
 #include <GL/glext.h>
 #include <stdio.h>
-#include <math.h>
+#include <cmath>
 #include <FreeImage.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <list>
+#include "CrashReporter.h"
 
 #define GLM_FORCE_RADIANS
 

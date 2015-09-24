@@ -23,7 +23,7 @@ void Engine::Init(int argc, char * argv[])						//inicjacja parametrow OpenGl i 
 	glutInitWindowSize(Instance->resolution.Width, Instance->resolution.Height);
 
 	glutCreateWindow(WINDOW_TITLE);
-	glutFullScreen();
+	//glutFullScreen();
 	glutKeyboardFunc(Engine::KeyboardFunc);
 	glutKeyboardUpFunc(Engine::KeyboardUpFunc);
 	glutDisplayFunc(Engine::DisplayFunc);
@@ -52,9 +52,9 @@ void Engine::DisplayFunc()		//glowna petla
 
 	Engine::RenderPass();
 
-	glFlush();
+	//glFlush();
 	glutSwapBuffers();
-	glutPostRedisplay();
+	//glutPostRedisplay();
 }
 
 void Engine::ReshapeFunc(int width, int height)	//funkcja zmiany rozmiaru okna
@@ -86,14 +86,10 @@ void Engine::UpdatePass()	//wykonywanie wszystkich obliczen
 
 
 void Engine::RenderPass(){	//funkcja wykonania rysowania wszystich elementow
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, 1440, 900);
-
-	glClearColor(0, 1, 0, 0);
+	glClearColor(0.2, 0.2, 0.2, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (GraphicalObject* obj : Engine::Instance->activeScene->graphicalObjects){
 		obj->draw();
 	}
-
 }

@@ -3,8 +3,11 @@
 std::list<Structure*> Structure::Structures;
 
 
-Structure::Structure() : StaticObject()
+Structure::Structure(glm::vec3 position, Model* model, Shader* shader) : StaticObject()
 {
+	this->position = position;
+	this->model = model;
+	this->shader = shader;
 	Structures.push_back(this);
 }
 

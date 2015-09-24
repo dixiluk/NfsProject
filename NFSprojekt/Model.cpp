@@ -18,15 +18,9 @@ Model::Model(char* name)
 		TriggerCrash("Nie mo¿na znaleœæ modelu!");
 	FbxScene* lScene = FbxScene::Create(lSdkManager, "myScene");
 	lImporter->Import(lScene);
-	bool anim = false;
 	for (int i = 0; i < lScene->GetRootNode()->GetChildCount(); i++){
 		FbxNode* node = lScene->GetRootNode()->GetChild(i);
 		char* texBaseName = (char*) node->GetName();
-		anim = false;
-		if (strcmp(texBaseName, "Armature") == 0) {
-			anim = true;
-			continue;
-		}
 		this->objects.push_back(new ModelObject(node));
 	}
 	Models.push_back(this);
