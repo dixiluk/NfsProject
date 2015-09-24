@@ -16,7 +16,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 axis)
 	this->pitch = 0;
 	this->yaw = 0;
 
-	this->setPerspective(90.0,
+	this->setPerspective(45.0,
 		(GLfloat) Engine::Instance->resolution.Width
 		/ Engine::Instance->resolution.Height, 1, 50);
 	this->setupCamera();
@@ -28,7 +28,10 @@ Camera::~Camera()
 
 void Camera::CameraMotion(GLint x, GLint y)	//funkcja obracanie kamery myszka
 {
-	if (x == Engine::Instance->resolution.Width / 2 && y == Engine::Instance->resolution.Height / 2) return;
+	if (!Engine::Instance->keyboard['m']) return;
+	
+	if ((x == Engine::Instance->resolution.Width / 2 +1 || x == Engine::Instance->resolution.Width / 2 -1 || x == Engine::Instance->resolution.Width / 2) 
+		&& (y == Engine::Instance->resolution.Height / 2 +1 || y == Engine::Instance->resolution.Height / 2 -1 || y == Engine::Instance->resolution.Height / 2)) return;
 	ActiveCamera->pitch += ((GLdouble) x - Engine::Instance->resolution.Width / 2) / 1000;
 	ActiveCamera->yaw += ((GLdouble) y - Engine::Instance->resolution.Height / 2) / 1000;
 
@@ -41,6 +44,8 @@ void Camera::CameraMotion(GLint x, GLint y)	//funkcja obracanie kamery myszka
 	ActiveCamera->direction.z = cos(ActiveCamera->pitch)*cos(ActiveCamera->yaw);
 
 	glutWarpPointer(Engine::Instance->resolution.Width / 2, Engine::Instance->resolution.Height / 2);
+	ActiveCamera->setupCamera();
+
 }
 
 void Camera::setActive()
@@ -54,10 +59,18 @@ void Camera::setPosition(glm::vec3 position) //ustawia pozycje kamery
 	this->setupCamera();
 }
 
+
 void Camera::setDirection(glm::vec3 direction){ //ustawia kierunek kamery
 	this->direction = glm::normalize(direction);
 	this->setupCamera();
 }
+
+void Camera::setDirectionToPosition(glm::vec3 position){ //ustawia kierunek kamery
+	this->direction = glm::normalize(position - this->position);
+
+	this->setupCamera();
+}
+
 
 void Camera::setAspectRatio(GLdouble aspectRatio){ // ustawia proporcje ekranu
 	this->aspectRatio = aspectRatio;

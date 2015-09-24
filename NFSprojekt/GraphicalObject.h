@@ -7,7 +7,7 @@ class GraphicalObject
 	friend class Engine;
 	friend class StructureShader;
 public:
-	GraphicalObject();
+	GraphicalObject(glm::vec3 position, Shader* shader);
 	~GraphicalObject();
 protected:
 	glm::vec3 position;
@@ -16,6 +16,6 @@ protected:
 	double rotationPower;
 
 	virtual void compute();
-	virtual void draw(Shader *shad = 0);
+	virtual void draw();
 };
 

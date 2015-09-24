@@ -8,7 +8,7 @@ Shader::Shader(char* vsFileName, char* psFileName)
 	char * path1 = (char*)malloc(2048);
 	strcpy(path1, SHADERS_SUBDIR);
 	strcat(path1, vsFileName);
-	FILE* file = fopen(path1, "r");
+	FILE* file = fopen(path1, "rb");
 	char* str = strerror(errno);
 
 	if (file == NULL)
@@ -26,7 +26,7 @@ Shader::Shader(char* vsFileName, char* psFileName)
 	char * path2 = (char*)malloc(2048);
 	strcpy(path2, SHADERS_SUBDIR);
 	strcat(path2, psFileName);
-	file = fopen(path2, "r");
+	file = fopen(path2, "rb");
 	if (file == NULL)
 		TriggerCrash("Could not found shader file");
 	fseek(file, 0, SEEK_END);

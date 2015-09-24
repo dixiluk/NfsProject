@@ -1,10 +1,14 @@
 #pragma once
 #include "GraphicalObject.h"
+#include "Model.h"
 
-class DynamicObject : GraphicalObject
+class DynamicObject : public GraphicalObject
 {
 public:
-	DynamicObject();
+	Model* model;
+	DynamicObject(glm::vec3 position, Shader* shader);
 	~DynamicObject();
+	void draw();
+	void compute();
 };
 

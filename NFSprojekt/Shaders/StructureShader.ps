@@ -1,24 +1,7 @@
 ﻿uniform sampler2D Texture;
-uniform int Switch;
-uniform int Pass;
-
-varying vec4 LightSpacePosition;
-varying vec3 Normal;
-varying vec3 Tangent;
-varying vec3 Binormal;
-varying vec3 WorldPosition;
-
 
 void main()
 {
-	//DepthValue = LightSpacePosition.z / LightSpacePosition.w;
-	//if(Pass == 0){
-	//	gl_FragColor = vec4(DepthValue,DepthValue,DepthValue,1.0);
-	//	return;
-	//}
-	//float ShadowFactor = CalcShadowFactor();
-
-	//float Brightness = ShadowFactor * (1.5-DepthValue);
-	//gl_FragColor = vec4(DepthValue,DepthValue,DepthValue,1.0);
-	gl_FragColor = vec4(0.5,0.1,0.8,1.0);
+	vec4 color = texture2D(Texture, gl_TexCoord[0].st);
+	gl_FragColor = color;
 }

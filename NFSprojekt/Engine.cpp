@@ -18,6 +18,11 @@ Engine::~Engine()
 
 void Engine::Init(int argc, char * argv[])						//inicjacja parametrow OpenGl i tworzenie okna
 {
+
+	for (int i = 0; i < 255; i++){
+		Instance->keyboard[i]=false;
+	}
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL);
 	glutInitWindowSize(Instance->resolution.Width, Instance->resolution.Height);
@@ -26,9 +31,12 @@ void Engine::Init(int argc, char * argv[])						//inicjacja parametrow OpenGl i 
 	//glutFullScreen();
 	glutKeyboardFunc(Engine::KeyboardFunc);
 	glutKeyboardUpFunc(Engine::KeyboardUpFunc);
+	glutSpecialFunc(Engine::SpecialFunc);
+	glutSpecialUpFunc(Engine::SpecialUpFunc);
 	glutDisplayFunc(Engine::DisplayFunc);
 	glutPassiveMotionFunc(Engine::PassiveMotionFunc);
 	glutReshapeFunc(Engine::ReshapeFunc);
+	glutIdleFunc(Engine::DisplayFunc);
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
 	{
@@ -52,9 +60,9 @@ void Engine::DisplayFunc()		//glowna petla
 
 	Engine::RenderPass();
 
-	//glFlush();
+	glFlush();
 	glutSwapBuffers();
-	//glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 void Engine::ReshapeFunc(int width, int height)	//funkcja zmiany rozmiaru okna
@@ -67,13 +75,28 @@ void Engine::ReshapeFunc(int width, int height)	//funkcja zmiany rozmiaru okna
 
 void Engine::KeyboardFunc(unsigned char key, int x, int y)
 {
+	Engine::Instance->keyboard[key] = true;
 
 }
 
 void Engine::KeyboardUpFunc(unsigned char key, int x, int y)
 {
+	Engine::Instance->keyboard[key] = false;
 
 }
+
+void Engine::SpecialFunc(int key, int x, int y)
+{
+	Engine::Instance->keyboard[key] = true;
+
+}
+
+void Engine::SpecialUpFunc(int key, int x, int y)
+{
+	Engine::Instance->keyboard[key] = false;
+
+}
+
 
 void Engine::PassiveMotionFunc(int x, int y){
 	Camera::CameraMotion(x, y);
@@ -81,7 +104,9 @@ void Engine::PassiveMotionFunc(int x, int y){
 
 void Engine::UpdatePass()	//wykonywanie wszystkich obliczen
 {
-
+	for (GraphicalObject* obj : Engine::Instance->activeScene->graphicalObjects){
+		obj->compute();
+	}
 }
 
 

@@ -24,6 +24,9 @@ public:
 
 	static Engine* Instance;
 
+	bool keyboard[255];
+
+
 	Engine(Resolution resolution);
 	~Engine();
 	static void Init(int argc, char * argv[]);
@@ -31,9 +34,11 @@ public:
 	static void ReshapeFunc(int width, int height);
 	static void KeyboardFunc(unsigned char key, int x, int y);
 	static void KeyboardUpFunc(unsigned char key, int x, int y);
+	static void SpecialFunc(int key, int x, int y);
+	static void SpecialUpFunc(int key, int x, int y);
 	static void PassiveMotionFunc(int x, int y);
-
 	static void UpdatePass();
 	static void RenderPass();
-
+	
+	
 };

@@ -1,47 +1,8 @@
 #include "ModelObject.h"
 
-
-void ModelObject::computeTangents(){		// tworzenie tg i ctg dla kazdego wierzcholka
-	int x;
-	for (int i = 0; i<this->verticesCount; i += 3){
-		x = i + 0;
-		glm::vec3 v0 = glm::vec3(this->v[x * 3 + 0], this->v[x * 3 + 1], this->v[x * 3 + 2]);
-		x++;
-		glm::vec3 v1 = glm::vec3(this->v[x * 3 + 0], this->v[x * 3 + 1], this->v[x * 3 + 2]);
-		x++;
-		glm::vec3 v2 = glm::vec3(this->v[x * 3 + 0], this->v[x * 3 + 1], this->v[x * 3 + 2]);
-
-		x = i + 0;
-		glm::vec2 uv0 = glm::vec2(this->uv[x * 2 + 0], this->uv[x * 2 + 1]);
-		x++;
-		glm::vec2 uv1 = glm::vec2(this->uv[x * 2 + 0], this->uv[x * 2 + 1]);
-		x++;
-		glm::vec2 uv2 = glm::vec2(this->uv[x * 2 + 0], this->uv[x * 2 + 1]);
-
-		glm::vec3 deltaPos1 = v1 - v0;
-		glm::vec3 deltaPos2 = v2 - v0;
-
-		glm::vec2 deltaUV1 = uv1 - uv0;
-		glm::vec2 deltaUV2 = uv2 - uv0;
-		float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
-		glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y)*r;
-		glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x)*r;
-
-		for (int p = 0; p<3; p++){
-			this->tan[(i + p) * 3 + 0] = tangent.x;
-			this->tan[(i + p) * 3 + 1] = tangent.y;
-			this->tan[(i + p) * 3 + 2] = tangent.z;
-
-			this->btan[(i + p) * 3 + 0] = bitangent.x;
-			this->btan[(i + p) * 3 + 1] = bitangent.y;
-			this->btan[(i + p) * 3 + 2] = bitangent.z;
-		}
-	}
-}
-
 void ModelObject::createArrayBuffer()		//Dodawanie wierzcholka do pamieci OpenGl
 {
-	GLuint  vertexLoc = 0, normalLoc = 1, texCoordLoc = 2, tangentLoc = 3, bitangentLoc = 4;
+	GLuint  vertexLoc = 0, normalLoc = 1, texCoordLoc = 2;
 
 	GLuint VAid;
 	glGenVertexArrays(1, &VAid);
@@ -79,22 +40,6 @@ void ModelObject::createArrayBuffer()		//Dodawanie wierzcholka do pamieci OpenGl
 		glVertexAttribPointer(texCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	}
 
-	if (this->tan && this->verticesCount > 0) {
-		glGenBuffers(1, &buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * this->verticesCount, this->tan, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(tangentLoc);
-		glVertexAttribPointer(tangentLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	}
-
-	if (this->btan && this->verticesCount > 0) {
-		glGenBuffers(1, &buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * this->verticesCount, this->btan, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(bitangentLoc);
-		glVertexAttribPointer(bitangentLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	}
-
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -116,8 +61,6 @@ void ModelObject::extractMesh(FbxNode* node){
 	this->v = new GLfloat[pMesh->GetPolygonCount() * 9];
 	this->uv = new GLfloat[pMesh->GetPolygonCount() * 6];
 	this->n = new GLfloat[pMesh->GetPolygonCount() * 9];
-	this->tan = new GLfloat[pMesh->GetPolygonCount() * 9];
-	this->btan = new GLfloat[pMesh->GetPolygonCount() * 9];
 
 	int vi = 0,
 		uvi = 0,
@@ -156,10 +99,7 @@ ModelObject::ModelObject(FbxNode* node)
 
 	this->name = node->GetName();
 
-	//this->ambientoccMap = new Texture(addChar(TEXTURES_SUBDIR, addChar((char*)this->name, "_OCC.png")));
 	this->diffuseMap = new Texture((std::string(TEXTURES_SUBDIR) + std::string(this->name) + "_COLOR.png").c_str());
-	//this->specularMap = new Texture(addChar(TEXTURES_SUBDIR, addChar((char*)this->name, "_SPEC.png")));
-	this->normalMap = new Texture((std::string(TEXTURES_SUBDIR) + std::string(this->name) + "_NRM.png").c_str());
 
 	FbxDouble3 pos = node->LclTranslation.Get();
 	this->relativePosition.x = pos.mData[0];
@@ -167,7 +107,6 @@ ModelObject::ModelObject(FbxNode* node)
 	this->relativePosition.z = pos.mData[2];
 
 	this->extractMesh(node);
-	this->computeTangents();
 	this->createArrayBuffer();
 }
 

@@ -10,6 +10,9 @@ private:
 	GLuint switchLink;
 	GLuint mvpLink;
 
+	GLuint czasLink; //
+
+
 	int switchVal;
 public:
 	void onPrepare(void* ptr);

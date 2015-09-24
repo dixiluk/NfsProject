@@ -7,11 +7,8 @@
 
 StructureShader::StructureShader() : Shader("StructureShader.vs", "StructureShader.ps")
 {
-	this->normalMatrixLink = glGetUniformLocation(this->program, "NormalMatrix");
-	this->textureLink = glGetUniformLocation(this->program, "Texture");
-	this->switchLink = glGetUniformLocation(this->program, "Switch");
+	this->textureLink = glGetUniformLocation(this->program, "DiffuseMap");
 	this->mvpLink = glGetUniformLocation(this->program, "MVP");
-	this->switchVal = 0;
 }
 
 
@@ -38,22 +35,11 @@ void StructureShader::onPrepare(void* ptr){
 	glm::mat4 ModelViewProjMatrix = Camera::ActiveCamera->projectionMatrix *
 		Camera::ActiveCamera->viewMatrix * ModelMatrix;
 
-	glm::mat3 NormalMatrix = glm::mat3(ModelMatrix);
-
 	glUniformMatrix4fv(this->mvpLink, 1, GL_FALSE, glm::value_ptr(ModelViewProjMatrix));
-	glUniformMatrix3fv(this->normalMatrixLink, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+	
 }
 
 void StructureShader::onDraw(void* ptr){
-	if (GetAsyncKeyState(VK_F1) != 0)
-		this->switchVal = 1;
-	if (GetAsyncKeyState(VK_F2) != 0)
-		this->switchVal = 2;
-	if (GetAsyncKeyState(VK_F3) != 0)
-		this->switchVal = 3;
-
-	glUniform1i(this->switchLink, this->switchVal);
-
 	ModelObject* obj = (ModelObject*) ptr;
 
 	glActiveTexture(GL_TEXTURE0);

@@ -1,7 +1,7 @@
 #include "StaticObject.h"
 
 
-StaticObject::StaticObject()
+StaticObject::StaticObject(glm::vec3 position, Shader* shader) : GraphicalObject(position, shader)
 {
 }
 
@@ -12,4 +12,4 @@ StaticObject::~StaticObject()
 
 
 
-void StaticObject::draw(Shader *shad){}
+void StaticObject::draw(){}

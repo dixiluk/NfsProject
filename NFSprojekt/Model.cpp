@@ -31,15 +31,3 @@ Model::~Model()
 {
 }
 
-Model* Model::GetModel(char* name, char* localization){
-	char* name2 = (char*) malloc(strlen(name) + strlen(localization) + 1);
-	strcpy(name2, localization);
-	if (!(localization[strlen(localization) - 1] == '/' || localization[strlen(localization) - 1] == '\\'))
-		strcat(name2, "/");
-	strcat(name2, name);
-	for (std::list<Model*>::iterator it = Models.begin(); it != Models.end(); it++){
-		if (strcmp((*it)->modelName, name2) == 0)
-			return *it;
-	}
-	return new Model(name2);
-}

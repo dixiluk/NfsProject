@@ -6,9 +6,9 @@ class StaticObject :
 {
 public:
 	Model* model;
-	StaticObject();
+	StaticObject(glm::vec3 position, Shader* shader);
 	~StaticObject();
-	void draw(Shader* shad = 0);
+	void draw();
 
 };
 
