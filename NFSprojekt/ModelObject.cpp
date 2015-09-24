@@ -95,18 +95,16 @@ void ModelObject::extractMesh(FbxNode* node){
 
 ModelObject::ModelObject(FbxNode* node)
 {
-	bool Animation = false;
-
 	this->name = node->GetName();
 
-	this->diffuseMap = new Texture((std::string(TEXTURES_SUBDIR) + std::string(this->name) + "_COLOR.png").c_str());
+	this->diffuseMap = new Texture((std::string(TEXTURES_SUBDIR) + std::string(this->name) + "_COLOR.png").c_str());	//pobranie tekstury
 
-	FbxDouble3 pos = node->LclTranslation.Get();
+	FbxDouble3 pos = node->LclTranslation.Get();	//pozycja podobiektu
 	this->relativePosition.x = pos.mData[0];
 	this->relativePosition.y = pos.mData[1];
 	this->relativePosition.z = pos.mData[2];
 
-	this->extractMesh(node);
+	this->extractMesh(node);	//pobieranie siatki
 	this->createArrayBuffer();
 }
 
