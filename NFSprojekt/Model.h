@@ -2,9 +2,6 @@
 #include "Environment.h"
 #include "ModelObject.h"
 
-/dsadasdsa
-#define private public
-
 class Model
 {
 	friend class Structure;
