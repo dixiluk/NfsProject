@@ -10,7 +10,7 @@ Texture::Texture(const char* filename, GLenum image_format, GLint internal_forma
 	unsigned int width(0), height(0);
 	GLuint gl_texID;
 
-	fif = FreeImage_GetFileType(filename, 0);
+	fif = FreeImage_GetFileType(filename, 0);  //pobieranie typu tekstury
 	if (fif == FIF_UNKNOWN)
 		fif = FreeImage_GetFIFFromFilename(filename);
 	if (fif == FIF_UNKNOWN){
@@ -19,24 +19,24 @@ Texture::Texture(const char* filename, GLenum image_format, GLint internal_forma
 	}
 
 
-	if (FreeImage_FIFSupportsReading(fif))
-		dib = FreeImage_Load(fif, filename);
+	if (FreeImage_FIFSupportsReading(fif))	//sprawdza czy moze odczytac
+		dib = FreeImage_Load(fif, filename);	//odczytuje
 
 	if (!dib)
 		ReportWarning("Could not load texture");
 
-	bits = FreeImage_GetBits(dib);
-	width = FreeImage_GetWidth(dib);
+	bits = FreeImage_GetBits(dib); //rozmiar piksela
+	width = FreeImage_GetWidth(dib);	//wielkosc tekstury
 	height = FreeImage_GetHeight(dib);
 
 	//if((bits == 0) || (width == 0) || (height == 0))
 	//ReportWarning("Wrong bits");
-	glBindTexture(GL_TEXTURE_2D, this->id);
+	glBindTexture(GL_TEXTURE_2D, this->id);		//bindowanie i ustawianie parametrow tekstury
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
-	glTexImage2D(GL_TEXTURE_2D, level, internal_format, width, height,
+	glTexImage2D(GL_TEXTURE_2D, level, internal_format, width, height,	//generowanie tekstury
 		border, image_format, GL_UNSIGNED_BYTE, bits);
 
 
@@ -48,11 +48,6 @@ Texture::~Texture()
 
 }
 
-void Texture::bind()
-{
-	printf("%d", this->id);
-	glBindTexture(GL_TEXTURE_2D, this->id);
-}
 
 GLuint Texture::getId()
 {

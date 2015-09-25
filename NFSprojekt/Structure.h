@@ -7,6 +7,7 @@ public:
 	static std::list<Structure*> Structures;
 	Structure(glm::vec3 position, Model* model, Shader* shader);
 	~Structure();
+	glm::mat4 iModelMat;
 protected:
 	void draw();
 

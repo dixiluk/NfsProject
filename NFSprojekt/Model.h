@@ -8,9 +8,9 @@ class Model
 	friend class DynamicObject;
 private:
 	static std::list<Model*> Models;
-	char* modelName;
 public:
 	std::list<ModelObject*> objects;
+	char* modelName;
 	Model(char* name);
 	~Model();
 };

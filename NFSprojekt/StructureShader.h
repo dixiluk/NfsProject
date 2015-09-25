@@ -4,16 +4,9 @@ class StructureShader :
 	public Shader
 {
 private:
-	GLuint pointLightCountLink, pointLightMatrixArrayLink;
-	GLuint normalMatrixLink;
+	GLuint modelMatrixLink;
 	GLuint textureLink;
-	GLuint switchLink;
 	GLuint mvpLink;
-
-	GLuint czasLink; //
-
-
-	int switchVal;
 public:
 	void onPrepare(void* ptr);
 	void onDraw(void* ptr);
