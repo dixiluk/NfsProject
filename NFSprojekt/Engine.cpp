@@ -3,6 +3,8 @@
 #include "DynamicObject.h"
 
 
+
+
 Engine* Engine::Instance = nullptr;
 
 
@@ -22,6 +24,11 @@ void Engine::Init(int argc, char * argv[])						//inicjacja parametrow OpenGl i 
 	for (int i = 0; i < 255; i++){
 		Instance->keyboard[i]=false;
 	}
+	Instance->gearboxUpKey = 49;
+	Instance->gearboxDownKey = 50;
+	Instance->moveCameraKey = 109;
+
+
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL);

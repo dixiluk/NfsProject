@@ -24,7 +24,7 @@ void StructureShader::onPrepare(void* ptr)
 
 	glm::mat4 ModelMatrix;
 	ModelMatrix = glm::translate(glm::mat4(1.0f), object->position);
-	ModelMatrix = glm::rotate(ModelMatrix, -1.57079633f, glm::vec3(1, 0, 0)); //Macierz modelu
+	ModelMatrix = glm::rotate(ModelMatrix, (float)(-1.57079633f*object->rotationPower), object->rotationAxis); //glm::vec3(1, 0, 0)); //Macierz modelu
 
 	glm::mat4 ModelViewProjMatrix = 
 		Camera::ActiveCamera->projectionMatrix *
