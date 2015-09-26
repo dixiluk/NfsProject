@@ -18,7 +18,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 axis)
 
 	this->setPerspective(45.0,
 		(GLfloat) Engine::Instance->resolution.Width
-		/ Engine::Instance->resolution.Height, 1, 50);
+		/ Engine::Instance->resolution.Height, 1, 5000);
 	this->setupCamera();
 }
 
@@ -28,8 +28,12 @@ Camera::~Camera()
 
 void Camera::CameraMotion(GLint x, GLint y)	//funkcja obracanie kamery myszka
 {
+
+
 	if (!Engine::Instance->keyboard[Engine::Instance->moveCameraKey]) return;
-	
+
+
+
 	if ((x == Engine::Instance->resolution.Width / 2 +1 || x == Engine::Instance->resolution.Width / 2 -1 || x == Engine::Instance->resolution.Width / 2) 
 		&& (y == Engine::Instance->resolution.Height / 2 +1 || y == Engine::Instance->resolution.Height / 2 -1 || y == Engine::Instance->resolution.Height / 2)) return;
 	ActiveCamera->pitch += ((GLdouble) x - Engine::Instance->resolution.Width / 2) / 1000;
@@ -39,9 +43,9 @@ void Camera::CameraMotion(GLint x, GLint y)	//funkcja obracanie kamery myszka
 	if (ActiveCamera->yaw >= PIS2) ActiveCamera->yaw = PIS2;
 	if (ActiveCamera->yaw <= -PIS2) ActiveCamera->yaw = -PIS2;
 
-	ActiveCamera->direction.x = -sin(ActiveCamera->pitch)*cos(ActiveCamera->yaw);
-	ActiveCamera->direction.y = -sin(ActiveCamera->yaw);
-	ActiveCamera->direction.z = cos(ActiveCamera->pitch)*cos(ActiveCamera->yaw);
+	ActiveCamera->position.x = -sin(ActiveCamera->pitch)*cos(ActiveCamera->yaw);
+	ActiveCamera->position.y = -sin(ActiveCamera->yaw);
+	ActiveCamera->position.z = cos(ActiveCamera->pitch)*cos(ActiveCamera->yaw);
 
 	glutWarpPointer(Engine::Instance->resolution.Width / 2, Engine::Instance->resolution.Height / 2);
 	ActiveCamera->setupCamera();
@@ -66,10 +70,11 @@ void Camera::setDirection(glm::vec3 direction){ //ustawia kierunek kamery
 }
 
 void Camera::setDirectionToPosition(glm::vec3 position){ //ustawia kierunek kamery
-	this->direction = glm::normalize(position - this->position);
-
+	glm::vec3 tmp = position - this->position;
+	this->direction = glm::normalize(tmp);
 	this->setupCamera();
 }
+
 
 
 void Camera::setAspectRatio(GLdouble aspectRatio){ // ustawia proporcje ekranu
@@ -119,3 +124,5 @@ void Camera::setupCamera()  //stworzenie macierzy widoku
 glm::vec4 Camera::calculateModelViewProjMatrix(glm::vec4 modelViewMatrix){
 	return viewProjectionMatrix * modelViewMatrix;
 }
+
+

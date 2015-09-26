@@ -17,6 +17,7 @@ public:
 	glm::vec3 position, direction, axis;
 	double pitch, yaw;
 	
+
 	bool mouseMotion;
 
 	void setActive();

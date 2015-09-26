@@ -4,7 +4,6 @@
 
 
 
-
 Engine* Engine::Instance = nullptr;
 
 
@@ -111,6 +110,21 @@ void Engine::PassiveMotionFunc(int x, int y){
 
 void Engine::UpdatePass()	//wykonywanie wszystkich obliczen
 {
+	if (Engine::Instance->keyboard['8'])
+		Camera::ActiveCamera->position.x += 0.1;
+	if (Engine::Instance->keyboard['2'])
+		Camera::ActiveCamera->position.x -= 0.1;
+	if (Engine::Instance->keyboard['1'])
+		Camera::ActiveCamera->position.y += 0.1;
+	if (Engine::Instance->keyboard['3'])
+		Camera::ActiveCamera->position.y -= 0.1;
+	if (Engine::Instance->keyboard['4'])
+		Camera::ActiveCamera->position.z += 0.1;
+	if (Engine::Instance->keyboard['6'])
+		Camera::ActiveCamera->position.z -= 0.1;
+
+	Camera::ActiveCamera->setupCamera();
+
 	for (GraphicalObject* obj : Engine::Instance->activeScene->graphicalObjects){
 		obj->compute();
 	}
@@ -123,5 +137,9 @@ void Engine::RenderPass(){	//funkcja wykonania rysowania wszystich elementow
 
 	for (GraphicalObject* obj : Engine::Instance->activeScene->graphicalObjects){
 		obj->draw();
+	}
+	for (GraphicalObject* obj : Engine::Instance->activeScene->kulki){
+		obj->draw();
+
 	}
 }

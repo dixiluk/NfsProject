@@ -4,7 +4,6 @@
 GraphicalObject::GraphicalObject(glm::vec3 position, Shader* shader)
 {
 	this->position = position;
-	this->rotationPower = 0.5;
 	this->shader = shader;
 }
 

@@ -9,11 +9,11 @@ class GraphicalObject
 public:
 	GraphicalObject(glm::vec3 position, Shader* shader);
 	~GraphicalObject();
+	bool isColision;
 protected:
 	glm::vec3 position;
 	glm::vec3 rotationAxis;
 	Shader* shader;
-	double rotationPower;
 
 	virtual void compute();
 	virtual void draw();

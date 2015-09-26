@@ -3,9 +3,11 @@
 std::list<Structure*> Structure::Structures;
 
 
-Structure::Structure(glm::vec3 position, Model* model, Shader* shader) : StaticObject(position, shader)
+Structure::Structure(glm::vec3 position, Model* model, Shader* shader, bool colision) : StaticObject(position, shader)
 {
 	this->model = model;
+	this->rotationAxis = glm::vec3{ 1, 0, 0 };
+	this->isColision = colision;
 	Structures.push_back(this);
 }
 

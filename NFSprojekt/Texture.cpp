@@ -29,8 +29,7 @@ Texture::Texture(const char* filename, GLenum image_format, GLint internal_forma
 	width = FreeImage_GetWidth(dib);	//wielkosc tekstury
 	height = FreeImage_GetHeight(dib);
 
-	//if((bits == 0) || (width == 0) || (height == 0))
-	//ReportWarning("Wrong bits");
+	
 	glBindTexture(GL_TEXTURE_2D, this->id);		//bindowanie i ustawianie parametrow tekstury
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

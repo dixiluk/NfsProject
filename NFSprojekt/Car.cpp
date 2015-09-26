@@ -1,5 +1,10 @@
 #include "Car.h"
 #include "Engine.h"
+#include "Structure.h"
+#include "Camera.h"
+#include "kulka.h"
+
+#include "StructureShader.h"
 
 #define addSpeedPerFrame 0.25
 #define rotationPowerFrame 0.25
@@ -17,7 +22,7 @@ Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(posit
 	this->gearup = false;
 	this->geardown = false;
 	this->maxGear = 6;
-	this->rotationAxis = glm::vec3{ 0.5, 0, 0 };
+	this->rotationAxis = glm::vec3{ 1, 0, 0};
 	this->speedAt6kRps[0] = -30;
 	this->speedAt6kRps[1] = 45;
 	this->speedAt6kRps[2] = 80;
@@ -25,6 +30,7 @@ Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(posit
 	this->speedAt6kRps[4] = 150;
 	this->speedAt6kRps[5] = 180;
 	this->speedAt6kRps[6] = 220;
+
 }
 
 
@@ -125,8 +131,10 @@ void Car::addSpeed()
 
 
 void Car::turn(bool site){
-	//this->rotationAxis();
-
+	if (site)
+		this->rotationAxis.z += (float) (0.1 * this->speed / 100);
+	else
+		this->rotationAxis.z -= (float) (0.1 * this->speed / 100);
 }
 
 
@@ -137,31 +145,124 @@ void Car::compute()
 	if (control){
 		this->gearbox();
 
-		printf("Gear: %i  speed: %f  rpm: %f\n", this->gear, this->speed, this->rpm);
+		//printf("Gear: %i  speed: %f  rpm: %f\n", this->gear, this->speed, this->rpm);
 
-
-
+		this->Colision();
 
 
 		if (Engine::Instance->keyboard[101])
 		{
 			this->addSpeed();
+			this->position.z += 0.1;
 
 		}
 		if (Engine::Instance->keyboard[103])
 		{
 			this->addSpeed();
+			this->position.z -= 0.1;
 
 		}
 		if (Engine::Instance->keyboard[100])
 		{
-			this->rotationAxis = glm::vec3{ 0.5, 0, 0 };
-
+			this->turn(false);
+			this->position.x += 0.1;
 		}
 		if (Engine::Instance->keyboard[102])
 		{
-			this->rotationAxis = glm::vec3{ 1, 0, 0 };
+			this->turn(true);
+			this->position.x -= 0.1;
 		}
-
+		if (Engine::Instance->keyboard['q'])
+		{
+			this->turn(false);
+			this->position.y += 0.1;
+		}
+		if (Engine::Instance->keyboard['w'])
+		{
+			this->turn(true);
+			this->position.y -= 0.1;
+		}
 	}
 }
+
+void Car::Colision(){
+	for each (Structure* item in Structure::Structures)
+	{
+		if (item->isColision){
+
+			for each (ModelObject* item2 in item->model->objects){
+				{
+					glm::vec3* tmp1 = new glm::vec3(0, 0, 0);
+					glm::vec3* tmp2 = new glm::vec3(0, 0, 0);
+					glm::mat4 ModelMatrix;
+					ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0,0,0));
+
+					ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f), glm::vec3(1, 0, 0)); //Macierz modelu
+
+
+					if (this->PointToMesh(this->position, glm::vec3(this->position.x, this->position.y, this->position.z - 0.5), item2->v, item2->verticesCount*3, ModelMatrix, tmp1, tmp2))
+						printf("found colision");
+				}
+			}
+		}
+	}
+}
+
+bool Car::rayIntersectsTriangle(glm::vec3 p, glm::vec3 d, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float& lenOnLine)
+{
+	glm::vec3 e1, e2, h, s, q;
+	float a, f, u, v;
+	e1 = v1 - v0;
+	e2 = v2 - v0;
+	h = cross(d, e2);
+	a = dot(e1, h);
+	if (a > -0.00001 && a < 0.00001)
+		return(false);
+
+	f = 1 / a;
+	s = p - v0;
+	u = f * (dot(s, h));
+
+	if (u < 0.0 || u > 1.0)
+		return(false);
+
+	q = cross(s, e1);
+	v = f * dot(d, q);
+
+	if (v < 0.0 || u + v > 1.0)
+		return(false);
+
+	lenOnLine = f * dot(e2, q);
+
+	return(true);
+}
+
+bool Car::PointToMesh(glm::vec3 P1, glm::vec3 P2, float* mesh, int meshSize, glm::mat4 ModelMatrix,
+	glm::vec3* intersectionPoint, glm::vec3* surfaceVector)
+{
+	glm::vec3 dir;
+	glm::vec3 p1, p2, p3;
+	StructureShader *tmp = new StructureShader();
+	float len;
+
+	//Engine::Instance->activeScene->kulki.push_back(new kulka(glm::vec3(0, 1, 2), tmp));
+	for (int i = 0; i<meshSize; i += 9){
+		p1.x = mesh[i]; p1.y = mesh[i + 1]; p1.z = mesh[i + 2];
+		p2.x = mesh[i + 3]; p2.y = mesh[i + 4]; p2.z = mesh[i + 5];
+		p3.x = mesh[i + 6]; p3.y = mesh[i + 7]; p3.z = mesh[i + 8];
+		p1 = glm::vec3(ModelMatrix * glm::vec4(p1, 1.0));
+		p2 = glm::vec3(ModelMatrix * glm::vec4(p2, 1.0));
+		p3 = glm::vec3(ModelMatrix * glm::vec4(p3, 1.0));
+		dir = normalize(P2 - P1);
+		if (rayIntersectsTriangle(P1, dir, p1, p2, p3, len)){
+			if (distance(P1, P2) >= len&&len >= 0){
+				*intersectionPoint = P1 + dir*len;
+				glm::vec3 u = p2 - p1, v = p3 - p1;
+				*surfaceVector = normalize(cross(u, v));
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
