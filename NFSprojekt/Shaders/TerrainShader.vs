@@ -8,10 +8,14 @@ attribute vec2 inTexcoord;  // Koordynanty tekstury
 uniform mat4 MVP;   //Macierz modelu * macierz widoku * macierz projekcji 
 uniform mat3 ModelMatrix; //Macierz modelu
 
-varying vec3 Normal;  // Zmienna współdzielona z programem fragmentów (.ps).
+// varying - Zmienna współdzielona z programem fragmentów (.ps).
+
+varying vec3 Normal;  //normalne siatki (wektory kierunkowe)
+varying vec2 ScaledUV; //Powiększona siatka UV dla tekstur trawy, ziemi, itp (by były większe)
 
 void main()
 {
+	ScaledUV = inTexcoord*100.0;
 	gl_TexCoord[0].st = inTexcoord;  //Wysyłanie koordynantów tekstury do programu fragmentu (.ps)
 	Normal = normalize (ModelMatrix * inNormal);  //Mnożenie wektorów kierunkowych wierzchołków przez macierz modelu (rotacja)
 	
