@@ -54,13 +54,12 @@ void TerrainShader::onPrepare(void* ptr)
 	glBindTexture(GL_TEXTURE_2D, object->textureMap->id);
 	glUniform1i(this->textureMapLink, 0);
 
-	//for (int i = 0; i < 4; i++){
-	int i = 0;
+	for (int i = 1; i <= 4; i++){
 		// Przesy³anie tekstury do programu shadera
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, object->texture[i]->id);
-		glUniform1i(this->textureLink[i], 0);
-	//}
+		glActiveTexture(GL_TEXTURE0+i);
+		glBindTexture(GL_TEXTURE_2D, object->texture[i-1]->id);
+		glUniform1i(this->textureLink[i-1], i);
+	}
 }
 
 void TerrainShader::onDraw(void* ptr){}
