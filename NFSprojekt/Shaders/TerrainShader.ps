@@ -12,8 +12,6 @@ void main()
 	endColor += texture2D(Texture[0], ScaledUV)*channelColor.r;
 	endColor += texture2D(Texture[1], ScaledUV)*channelColor.g;
 	endColor += texture2D(Texture[2], ScaledUV)*channelColor.b;
-	
-
 
 	gl_FragColor = endColor; // Zastosowanie koloru piksela
   }

@@ -140,6 +140,6 @@ void Engine::RenderPass(){	//funkcja wykonania rysowania wszystich elementow
 	}
 	for (GraphicalObject* obj : Engine::Instance->activeScene->kulki){
 		obj->draw();
-
 	}
+	Engine::Instance->activeScene->kulki.clear();
 }

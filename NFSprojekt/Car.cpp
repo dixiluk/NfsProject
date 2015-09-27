@@ -9,20 +9,20 @@
 #define addSpeedPerFrame 0.25
 #define minusSpeedPerFrame 1
 #define rotationPowerFrame 0.25
-#define carLength 3
-#define carWidth 0.8
+#define carLength 5.1
+#define carWidth 2.1
 
 std::list<Car*> Car::Cars;
 
 Car* Car::ControledCar = 0;
 Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(position, shader)
 {
-	this->colisionPoint.push_back(glm::vec3(carWidth / 2.0, -carLength / 2.0, 3.0));
-	this->colisionPoint.push_back(glm::vec3(0, -carLength / 2.0, 3.0));
-	this->colisionPoint.push_back(glm::vec3(-carWidth / 2.0, -carLength / 2.0, 3.0));
-	this->colisionPoint.push_back(glm::vec3(carWidth / 2.0, carLength / 2, 3.0));
-	this->colisionPoint.push_back(glm::vec3(0, carLength / 2.0, 3.0));
-	this->colisionPoint.push_back(glm::vec3(-carWidth / 2.0, carLength / 2.0, 3.0));
+	this->colisionPoint.push_back(glm::vec3(carWidth / 2.0, -carLength / 2.0, 0.3));
+	this->colisionPoint.push_back(glm::vec3(0, -carLength / 2.0-0.1, 0.3));
+	this->colisionPoint.push_back(glm::vec3(-carWidth / 2.0, -carLength / 2.0, 0.3));
+	this->colisionPoint.push_back(glm::vec3(carWidth / 2.0, carLength / 2.0+0.2, 0.3));
+	this->colisionPoint.push_back(glm::vec3(0, carLength / 2.0+0.3, 0.3));
+	this->colisionPoint.push_back(glm::vec3(-carWidth / 2.0, carLength / 2.0+0.2, 0.3));
 	this->model = model;
 	Cars.push_back(this);
 	this->speed = 0;
@@ -179,23 +179,37 @@ void Car::addSpeed()
 
 
 void Car::turn(bool site){
-	if (this->speed > 30) {
-		if (site)
-			this->rotationAxis.z += (float) (0.006 * (-log(this->speed - 20) + 7));
-		else
-			this->rotationAxis.z -= (float) (0.006 * (-log(this->speed - 20) + 7));
-
-	}
-	else
-	{
+	if (this->speed <= 0){
 		if (site)
 		{
-			this->rotationAxis.z += (float) (0.006 * log(this->speed + 1)*1.4);
+			this->rotationAxis.z += (float) (0.006 * log(-this->speed + 1)*1.4);
 		}
 		else
 		{
-			this->rotationAxis.z -= (float) (0.006 * log(this->speed + 1)*1.4);
+			this->rotationAxis.z -= (float) (0.006 * log(-this->speed + 1)*1.4);
 
+		}
+	}
+	else
+	{
+		if (this->speed > 30) {
+			if (site)
+				this->rotationAxis.z += (float) (0.006 * (-log(this->speed - 20) + 7));
+			else
+				this->rotationAxis.z -= (float) (0.006 * (-log(this->speed - 20) + 7));
+
+		}
+		else
+		{
+			if (site)
+			{
+				this->rotationAxis.z += (float) (0.006 * log(this->speed + 1)*1.4);
+			}
+			else
+			{
+				this->rotationAxis.z -= (float) (0.006 * log(this->speed + 1)*1.4);
+
+			}
 		}
 	}
 }
@@ -226,7 +240,6 @@ void Car::compute()
 		{
 			this->turn(true);
 		}
-		this->Colision();
 		this->move();
 
 
@@ -235,103 +248,42 @@ void Car::compute()
 
 
 void Car::move(){
-	glm::vec4 vec = this->iModelMat * glm::vec4(this->directionPoint, 1);
-	glm::vec3 t = glm::vec3(vec);
-	//Engine::Instance->activeScene->kulki.push_back(new kulka(t, new StructureShader()));
+
 
 
 	for each (glm::vec3 var in this->colisionPoint)
 	{
 		glm::vec4 vec = this->iModelMat * glm::vec4(var, 1);
 		glm::vec3 t = glm::vec3(vec);
-		//Engine::Instance->activeScene->kulki.push_back(new kulka(t, new StructureShader()));
+
+
+		
+		glm::vec4 vec2 = this->iModelMat * glm::vec4(this->directionPoint - this->position +t , 1);
+
+		glm::vec3 t2 = (glm::vec3(vec2) - t)*(float) (this->speed / 100);
+
+		glm::vec3* tmp1 = new glm::vec3(0, 0, 0);
+		glm::vec3* tmp2 = new glm::vec3(0,0,0);
+
+		/*if (Structure::Colision(tmp1, tmp2, t, t+t2))
+			printf("Kolizja \n");*/
+
+		//Engine::Instance->activeScene->kulki.push_back(new kulka(t+t2, new StructureShader()));
 	}
 
+	glm::vec4 vec = this->iModelMat * glm::vec4(this->directionPoint, 1);
+	glm::vec3 t = (glm::vec3(vec) - this->position)*(float) (this->speed / 100);
 
+	Engine::Instance->activeScene->kulki.push_back(new kulka(this->position+t, new StructureShader()));
+	Engine::Instance->activeScene->kulki.push_back(new kulka(this->position+this->directionPoint, new StructureShader()));
 
+	/*if (Structure::Colision(tmp1, tmp2, this->position, this->position+t))
+		printf("Kolizja \n");*/
 
-	this->position += (t - this->position)*(float) (this->speed / 100);
+	this->position += t;
 	Camera::ActiveCamera->position = this->position;
 
 }
 
-void Car::Colision(){
-	for each (Structure* item in Structure::Structures)
-	{
-		if (item->isColision){
 
-			for each (ModelObject* item2 in item->model->objects){
-				{
-					glm::vec3* tmp1 = new glm::vec3(0, 0, 0);
-					glm::vec3* tmp2 = new glm::vec3(0, 0, 0);
-
-
-					if (this->PointToMesh(this->position, glm::vec3(this->position.x, this->position.y, this->position.z - 0.5), item2->v, item2->verticesCount * 3, item->iModelMat, tmp1, tmp2))
-					{
-						this->speed = 0;
-						printf("found colision");
-					}
-				}
-			}
-		}
-	}
-}
-
-bool Car::rayIntersectsTriangle(glm::vec3 p, glm::vec3 d, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float& lenOnLine)
-{
-	glm::vec3 e1, e2, h, s, q;
-	float a, f, u, v;
-	e1 = v1 - v0;
-	e2 = v2 - v0;
-	h = cross(d, e2);
-	a = dot(e1, h);
-	if (a > -0.00001 && a < 0.00001)
-		return(false);
-
-	f = 1 / a;
-	s = p - v0;
-	u = f * (dot(s, h));
-
-	if (u < 0.0 || u > 1.0)
-		return(false);
-
-	q = cross(s, e1);
-	v = f * dot(d, q);
-
-	if (v < 0.0 || u + v > 1.0)
-		return(false);
-
-	lenOnLine = f * dot(e2, q);
-
-	return(true);
-}
-
-bool Car::PointToMesh(glm::vec3 P1, glm::vec3 P2, float* mesh, int meshSize, glm::mat4 ModelMatrix,
-	glm::vec3* intersectionPoint, glm::vec3* surfaceVector)
-{
-	glm::vec3 dir;
-	glm::vec3 p1, p2, p3;
-	StructureShader *tmp = new StructureShader();
-	float len;
-
-	//Engine::Instance->activeScene->kulki.push_back(new kulka(glm::vec3(0, 1, 2), tmp));
-	for (int i = 0; i<meshSize; i += 9){
-		p1.x = mesh[i]; p1.y = mesh[i + 1]; p1.z = mesh[i + 2];
-		p2.x = mesh[i + 3]; p2.y = mesh[i + 4]; p2.z = mesh[i + 5];
-		p3.x = mesh[i + 6]; p3.y = mesh[i + 7]; p3.z = mesh[i + 8];
-		p1 = glm::vec3(ModelMatrix * glm::vec4(p1, 1.0));
-		p2 = glm::vec3(ModelMatrix * glm::vec4(p2, 1.0));
-		p3 = glm::vec3(ModelMatrix * glm::vec4(p3, 1.0));
-		dir = normalize(P2 - P1);
-		if (rayIntersectsTriangle(P1, dir, p1, p2, p3, len)){
-			if (distance(P1, P2) >= len&&len >= 0){
-				*intersectionPoint = P1 + dir*len;
-				glm::vec3 u = p2 - p1, v = p3 - p1;
-				*surfaceVector = normalize(cross(u, v));
-				return true;
-			}
-		}
-	}
-	return false;
-}
 
