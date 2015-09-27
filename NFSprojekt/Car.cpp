@@ -14,15 +14,15 @@
 
 std::list<Car*> Car::Cars;
 
-Car* Car::ControledCar=0;
+Car* Car::ControledCar = 0;
 Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(position, shader)
 {
-	this->colisionPoint.push_back(glm::vec3(carWidth/2.0, -carLength/2.0, 3.0));
-	this->colisionPoint.push_back(glm::vec3(0, -carLength/2.0, 3.0));
-	this->colisionPoint.push_back(glm::vec3(-carWidth/2.0, -carLength/2.0, 3.0));
-	this->colisionPoint.push_back(glm::vec3(carWidth/2.0, carLength/2, 3.0));
-	this->colisionPoint.push_back(glm::vec3(0, carLength/2.0, 3.0));
-	this->colisionPoint.push_back(glm::vec3(-carWidth/2.0, carLength/2.0, 3.0));
+	this->colisionPoint.push_back(glm::vec3(carWidth / 2.0, -carLength / 2.0, 3.0));
+	this->colisionPoint.push_back(glm::vec3(0, -carLength / 2.0, 3.0));
+	this->colisionPoint.push_back(glm::vec3(-carWidth / 2.0, -carLength / 2.0, 3.0));
+	this->colisionPoint.push_back(glm::vec3(carWidth / 2.0, carLength / 2, 3.0));
+	this->colisionPoint.push_back(glm::vec3(0, carLength / 2.0, 3.0));
+	this->colisionPoint.push_back(glm::vec3(-carWidth / 2.0, carLength / 2.0, 3.0));
 	this->model = model;
 	Cars.push_back(this);
 	this->speed = 0;
@@ -31,7 +31,7 @@ Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(posit
 	this->gearup = false;
 	this->geardown = false;
 	this->maxGear = 6;
-	this->rotationAxis = glm::vec3( 1, 0, 0);
+	this->rotationAxis = glm::vec3(1, 0, 0);
 	this->speedAt6kRps[0] = -30;
 	this->speedAt6kRps[1] = 45;
 	this->speedAt6kRps[2] = 80;
@@ -40,7 +40,7 @@ Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(posit
 	this->speedAt6kRps[5] = 180;
 	this->speedAt6kRps[6] = 220;
 	ControledCar = this;
-	this->directionPoint = glm::vec3( 0,-1,0 );
+	this->directionPoint = glm::vec3(0, -1, 0);
 }
 
 
@@ -68,13 +68,13 @@ void Car::draw()
 void Car::calculateSpeed()
 {
 
-		this->speed = (double)this->speedAt6kRps[this->gear] / 6000 * this->rpm;
+	this->speed = (double)this->speedAt6kRps[this->gear] / 6000 * this->rpm;
 }
 void Car::calculaterpm()
 {
 
-		this->rpm = this->speed * 6000 / (double)this->speedAt6kRps[this->gear];
-		if (this->rpm <= 0) this->rpm = 0;
+	this->rpm = this->speed * 6000 / (double)this->speedAt6kRps[this->gear];
+	if (this->rpm <= 0) this->rpm = 0;
 
 }
 
@@ -82,11 +82,11 @@ void Car::calculaterpm()
 
 void Car::gearbox(){
 	if (Engine::Instance->keyboard[Engine::Instance->gearboxDownKey]){
-		if (this->gearup==false)
+		if (this->gearup == false)
 		{
 			this->gearup = true;
 
-			if(this->speed==0 || this->gear>0)
+			if (this->speed == 0 || this->gear>0)
 			if (this->gear < this->maxGear){
 				this->gear++;
 				this->calculaterpm();
@@ -104,8 +104,8 @@ void Car::gearbox(){
 		if (!this->geardown)
 		{
 			this->geardown = true;
-			
-			if (this->gear == 1 && this->speed==0) {
+
+			if (this->gear == 1 && this->speed == 0) {
 				this->gear--;
 				this->calculaterpm();
 			}
@@ -115,16 +115,16 @@ void Car::gearbox(){
 				this->calculaterpm();
 			}
 
-			
+
 
 		}
 	}
 
 	if (!Engine::Instance->keyboard[Engine::Instance->gearboxUpKey])
 	{
-		
+
 		this->geardown = false;
-		
+
 	}
 }
 
@@ -143,7 +143,7 @@ void Car::minusSpeed()
 		this->speed += tmpSpeed;
 		if (this->speed > 0) this->speed = 0;
 	}
-	
+
 	this->calculaterpm();
 
 }
@@ -151,7 +151,7 @@ void Car::minusSpeed()
 void Car::addSpeed()
 {
 	double tmpSpeed = addSpeedPerFrame - 0.03*this->gear;
-	if (this->gear == 0) 
+	if (this->gear == 0)
 	{
 		if (this->rpm < 4000) {
 
@@ -181,20 +181,20 @@ void Car::addSpeed()
 void Car::turn(bool site){
 	if (this->speed > 30) {
 		if (site)
-			this->rotationAxis.z += (float)(0.006 * (-log(this->speed - 20) + 7));
+			this->rotationAxis.z += (float) (0.006 * (-log(this->speed - 20) + 7));
 		else
-			this->rotationAxis.z -= (float)(0.006 * (-log(this->speed - 20) + 7));
+			this->rotationAxis.z -= (float) (0.006 * (-log(this->speed - 20) + 7));
 
 	}
 	else
 	{
-		if (site) 
+		if (site)
 		{
-			this->rotationAxis.z += (float)(0.006 * log(this->speed + 1)*1.4);
+			this->rotationAxis.z += (float) (0.006 * log(this->speed + 1)*1.4);
 		}
 		else
 		{
-			this->rotationAxis.z -= (float)(0.006 * log(this->speed + 1)*1.4);
+			this->rotationAxis.z -= (float) (0.006 * log(this->speed + 1)*1.4);
 
 		}
 	}
@@ -205,7 +205,7 @@ void Car::turn(bool site){
 
 void Car::compute()
 {
-	if (ControledCar==this){
+	if (ControledCar == this){
 		this->gearbox();
 
 		printf("Gear: %i  speed: %f  rpm: %f\n", this->gear, this->speed, this->rpm);
@@ -235,7 +235,7 @@ void Car::compute()
 
 
 void Car::move(){
-	glm::vec4 vec = this->iModelMat * glm::vec4(this->directionPoint,1);
+	glm::vec4 vec = this->iModelMat * glm::vec4(this->directionPoint, 1);
 	glm::vec3 t = glm::vec3(vec);
 	//Engine::Instance->activeScene->kulki.push_back(new kulka(t, new StructureShader()));
 
@@ -250,7 +250,7 @@ void Car::move(){
 
 
 
-	this->position += (t-this->position)*(float)(this->speed/100);
+	this->position += (t - this->position)*(float) (this->speed / 100);
 	Camera::ActiveCamera->position = this->position;
 
 }

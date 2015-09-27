@@ -6,6 +6,7 @@ class GraphicalObject
 {
 	friend class Engine;
 	friend class StructureShader;
+	friend class TerrainShader;
 	friend class CarShader;
 public:
 	GraphicalObject(glm::vec3 position, Shader* shader);
