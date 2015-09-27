@@ -17,13 +17,13 @@ int main(int argc, char * argv[])
 
 	Scene* scene = new Scene();
 	kulka::kulkam = new Model("kulka.fbx");
+	Engine::Instance->activeScene = (Scene*) scene;
+	Camera *camera = new Camera(glm::vec3(10, -1, -7));
 
 	//scene->addGraphicalObject(new Car(glm::vec3(0, 0, 0), new Model("premier.fbx"), new StructureShader()));
 	scene->addGraphicalObject(new Structure(glm::vec3(0, 0, 0), new Model("RacingGameLevel.fbx"), new StructureShader(), false));
 	scene->addGraphicalObject(new Structure(glm::vec3(0, 0, 0), new Model("RacingGameLevelCollision.fbx"), new StructureShader(), true));
 	scene->addGraphicalObject(new Car(glm::vec3(10, -1, -7), new Model("premier.fbx"), new CarShader()));
-	Engine::Instance->activeScene = (Scene*) scene;
-	Camera *camera = new Camera(glm::vec3(10, -1, -7));
 	camera->setActive();
 	glutMainLoop();
 

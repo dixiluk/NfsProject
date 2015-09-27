@@ -9,12 +9,20 @@
 #define addSpeedPerFrame 0.25
 #define minusSpeedPerFrame 1
 #define rotationPowerFrame 0.25
+#define carLength 3
+#define carWidth 0.8
 
 std::list<Car*> Car::Cars;
 
 Car* Car::ControledCar=0;
 Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(position, shader)
 {
+	this->colisionPoint.push_back(glm::vec3(carWidth/2.0, -carLength/2.0, 3.0));
+	this->colisionPoint.push_back(glm::vec3(0, -carLength/2.0, 3.0));
+	this->colisionPoint.push_back(glm::vec3(-carWidth/2.0, -carLength/2.0, 3.0));
+	this->colisionPoint.push_back(glm::vec3(carWidth/2.0, carLength/2, 3.0));
+	this->colisionPoint.push_back(glm::vec3(0, carLength/2.0, 3.0));
+	this->colisionPoint.push_back(glm::vec3(-carWidth/2.0, carLength/2.0, 3.0));
 	this->model = model;
 	Cars.push_back(this);
 	this->speed = 0;
@@ -201,7 +209,6 @@ void Car::compute()
 		this->gearbox();
 
 		printf("Gear: %i  speed: %f  rpm: %f\n", this->gear, this->speed, this->rpm);
-		this->Colision();
 
 		if (Engine::Instance->keyboard[101])
 		{
@@ -219,6 +226,7 @@ void Car::compute()
 		{
 			this->turn(true);
 		}
+		this->Colision();
 		this->move();
 
 
@@ -230,6 +238,18 @@ void Car::move(){
 	glm::vec4 vec = this->iModelMat * glm::vec4(this->directionPoint,1);
 	glm::vec3 t = glm::vec3(vec);
 	//Engine::Instance->activeScene->kulki.push_back(new kulka(t, new StructureShader()));
+
+
+	for each (glm::vec3 var in this->colisionPoint)
+	{
+		glm::vec4 vec = this->iModelMat * glm::vec4(var, 1);
+		glm::vec3 t = glm::vec3(vec);
+		//Engine::Instance->activeScene->kulki.push_back(new kulka(t, new StructureShader()));
+	}
+
+
+
+
 	this->position += (t-this->position)*(float)(this->speed/100);
 	Camera::ActiveCamera->position = this->position;
 
