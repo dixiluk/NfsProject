@@ -29,7 +29,7 @@ void StructureShader::onPrepare(void* ptr)
 	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*object->rotationAxis.x), glm::vec3(1, 0, 0)); //Macierz modelu
 	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*object->rotationAxis.y), glm::vec3(0, 1, 0)); //Macierz modelu
 	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*object->rotationAxis.z), glm::vec3(0, 0, 1)); //Macierz modelu
-
+	
 	object->iModelMat = ModelMatrix;
 
 	glm::mat4 ModelViewProjMatrix = 

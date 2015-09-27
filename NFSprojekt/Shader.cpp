@@ -55,6 +55,7 @@ Shader::Shader(char* vsFileName, char* psFileName)
 	printf(log);
 	glGetShaderInfoLog(pixelShader, 1024, &len, log);
 	printf(log);
+	free(log);
 	// Create Shader And Program Objects
 	program = glCreateProgram();
 

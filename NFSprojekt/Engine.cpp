@@ -110,7 +110,7 @@ void Engine::PassiveMotionFunc(int x, int y){
 
 void Engine::UpdatePass()	//wykonywanie wszystkich obliczen
 {
-	if (Engine::Instance->keyboard['8'])
+	/*if (Engine::Instance->keyboard['8'])
 		Camera::ActiveCamera->position.x += 0.1;
 	if (Engine::Instance->keyboard['2'])
 		Camera::ActiveCamera->position.x -= 0.1;
@@ -121,7 +121,7 @@ void Engine::UpdatePass()	//wykonywanie wszystkich obliczen
 	if (Engine::Instance->keyboard['4'])
 		Camera::ActiveCamera->position.z += 0.1;
 	if (Engine::Instance->keyboard['6'])
-		Camera::ActiveCamera->position.z -= 0.1;
+		Camera::ActiveCamera->position.z -= 0.1;*/
 
 	Camera::ActiveCamera->setupCamera();
 

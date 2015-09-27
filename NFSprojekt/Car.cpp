@@ -7,22 +7,23 @@
 #include "StructureShader.h"
 
 #define addSpeedPerFrame 0.25
+#define minusSpeedPerFrame 1
 #define rotationPowerFrame 0.25
 
 std::list<Car*> Car::Cars;
 
+Car* Car::ControledCar=0;
 Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(position, shader)
 {
 	this->model = model;
 	Cars.push_back(this);
-	this->control = true;
 	this->speed = 0;
 	this->rpm = 0;
 	this->gear = 1;
 	this->gearup = false;
 	this->geardown = false;
 	this->maxGear = 6;
-	this->rotationAxis = glm::vec3{ 1, 0, 0};
+	this->rotationAxis = glm::vec3( 1, 0, 0);
 	this->speedAt6kRps[0] = -30;
 	this->speedAt6kRps[1] = 45;
 	this->speedAt6kRps[2] = 80;
@@ -30,7 +31,8 @@ Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(posit
 	this->speedAt6kRps[4] = 150;
 	this->speedAt6kRps[5] = 180;
 	this->speedAt6kRps[6] = 220;
-
+	ControledCar = this;
+	this->directionPoint = glm::vec3( 0,-1,0 );
 }
 
 
@@ -64,11 +66,7 @@ void Car::calculaterpm()
 {
 
 		this->rpm = this->speed * 6000 / (double)this->speedAt6kRps[this->gear];
-		if (this->rpm > 7000)
-		{
-			this->rpm = 7000;
-			this->calculateSpeed();
-		}
+		if (this->rpm <= 0) this->rpm = 0;
 
 }
 
@@ -76,9 +74,11 @@ void Car::calculaterpm()
 
 void Car::gearbox(){
 	if (Engine::Instance->keyboard[Engine::Instance->gearboxDownKey]){
-		if (!this->gearup)
+		if (this->gearup==false)
 		{
 			this->gearup = true;
+
+			if(this->speed==0 || this->gear>0)
 			if (this->gear < this->maxGear){
 				this->gear++;
 				this->calculaterpm();
@@ -96,10 +96,18 @@ void Car::gearbox(){
 		if (!this->geardown)
 		{
 			this->geardown = true;
+			
+			if (this->gear == 1 && this->speed==0) {
+				this->gear--;
+				this->calculaterpm();
+			}
+
 			if (this->gear > 1){
 				this->gear--;
 				this->calculaterpm();
 			}
+
+			
 
 		}
 	}
@@ -113,28 +121,75 @@ void Car::gearbox(){
 }
 
 
+void Car::minusSpeed()
+{
+	double tmpSpeed = minusSpeedPerFrame;
+	if (this->speed > 0)
+	{
+		this->speed -= tmpSpeed;
+		if (this->speed < 0) this->speed = 0;
+	}
+
+	if (this->speed < 0)
+	{
+		this->speed += tmpSpeed;
+		if (this->speed > 0) this->speed = 0;
+	}
+	
+	this->calculaterpm();
+
+}
+
 void Car::addSpeed()
 {
-	double tmpSpeed = addSpeedPerFrame-0.03*this->gear;
-		if (this->rpm < 4000){
+	double tmpSpeed = addSpeedPerFrame - 0.03*this->gear;
+	if (this->gear == 0) 
+	{
+		if (this->rpm < 4000) {
+
+			this->speed -= (tmpSpeed*((8 + 3 * this->rpm / 1000) / 20));
+		}
+		if (this->rpm >= 4000) {
+
+			this->speed -= (tmpSpeed*(1 - (this->rpm - 4000) / 2800));
+		}
+	}
+	else
+	{
+		if (this->rpm < 4000) {
 
 			this->speed += (tmpSpeed*((8 + 3 * this->rpm / 1000) / 20));
 		}
-		if (this->rpm >= 4000){
+		if (this->rpm >= 4000) {
 
-			this->speed += (tmpSpeed*(1-(this->rpm-4000)/2800));
+			this->speed += (tmpSpeed*(1 - (this->rpm - 4000) / 2800));
 		}
-
+	}
 	this->calculaterpm();
 
 }
 
 
 void Car::turn(bool site){
-	if (site)
-		this->rotationAxis.z += (float) (0.1 * this->speed / 100);
+	if (this->speed > 30) {
+		if (site)
+			this->rotationAxis.z += (float)(0.006 * (-log(this->speed - 20) + 7));
+		else
+			this->rotationAxis.z -= (float)(0.006 * (-log(this->speed - 20) + 7));
+
+	}
 	else
-		this->rotationAxis.z -= (float) (0.1 * this->speed / 100);
+	{
+		if (site) 
+		{
+			this->rotationAxis.z += (float)(0.006 * log(this->speed + 1)*1.4);
+		}
+		else
+		{
+			this->rotationAxis.z -= (float)(0.006 * log(this->speed + 1)*1.4);
+
+		}
+	}
 }
 
 
@@ -142,47 +197,42 @@ void Car::turn(bool site){
 
 void Car::compute()
 {
-	if (control){
+	if (ControledCar==this){
 		this->gearbox();
 
-		//printf("Gear: %i  speed: %f  rpm: %f\n", this->gear, this->speed, this->rpm);
-
+		printf("Gear: %i  speed: %f  rpm: %f\n", this->gear, this->speed, this->rpm);
 		this->Colision();
-
 
 		if (Engine::Instance->keyboard[101])
 		{
 			this->addSpeed();
-			this->position.z += 0.1;
-
 		}
 		if (Engine::Instance->keyboard[103])
 		{
-			this->addSpeed();
-			this->position.z -= 0.1;
-
+			this->minusSpeed();
 		}
 		if (Engine::Instance->keyboard[100])
 		{
 			this->turn(false);
-			this->position.x += 0.1;
 		}
 		if (Engine::Instance->keyboard[102])
 		{
 			this->turn(true);
-			this->position.x -= 0.1;
 		}
-		if (Engine::Instance->keyboard['q'])
-		{
-			this->turn(false);
-			this->position.y += 0.1;
-		}
-		if (Engine::Instance->keyboard['w'])
-		{
-			this->turn(true);
-			this->position.y -= 0.1;
-		}
+		this->move();
+
+
 	}
+}
+
+
+void Car::move(){
+	glm::vec4 vec = this->iModelMat * glm::vec4(this->directionPoint,1);
+	glm::vec3 t = glm::vec3(vec);
+	//Engine::Instance->activeScene->kulki.push_back(new kulka(t, new StructureShader()));
+	this->position += (t-this->position)*(float)(this->speed/100);
+	Camera::ActiveCamera->position = this->position;
+
 }
 
 void Car::Colision(){
@@ -194,14 +244,13 @@ void Car::Colision(){
 				{
 					glm::vec3* tmp1 = new glm::vec3(0, 0, 0);
 					glm::vec3* tmp2 = new glm::vec3(0, 0, 0);
-					glm::mat4 ModelMatrix;
-					ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0,0,0));
-
-					ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f), glm::vec3(1, 0, 0)); //Macierz modelu
 
 
-					if (this->PointToMesh(this->position, glm::vec3(this->position.x, this->position.y, this->position.z - 0.5), item2->v, item2->verticesCount*3, ModelMatrix, tmp1, tmp2))
+					if (this->PointToMesh(this->position, glm::vec3(this->position.x, this->position.y, this->position.z - 0.5), item2->v, item2->verticesCount * 3, item->iModelMat, tmp1, tmp2))
+					{
+						this->speed = 0;
 						printf("found colision");
+					}
 				}
 			}
 		}

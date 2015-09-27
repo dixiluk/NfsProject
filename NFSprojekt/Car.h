@@ -11,8 +11,11 @@ public:
 	void compute();
 	Car(glm::vec3 position, Model* model, Shader* shader);
 	~Car();
+	glm::mat4 iModelMat;
 private:
-	bool control;
+	glm::vec3 directionPoint;
+	void move();
+	static Car* ControledCar;
 	double speed, rpm;
 	short gear, maxGear;
 	bool gearup, geardown;
@@ -20,6 +23,7 @@ private:
 	void calculaterpm();
 	int speedAt6kRps [7];
 	void addSpeed();
+	void minusSpeed();
 	void gearbox();
 	void turn(bool site);
 	bool PointToMesh(glm::vec3 P1, glm::vec3 P2, float* mesh, int meshSize, glm::mat4 invertedModelMatrix, glm::vec3* intersectionPoint, glm::vec3* surfaceVector);

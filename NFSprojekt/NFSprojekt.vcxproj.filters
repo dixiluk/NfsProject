@@ -63,6 +63,9 @@
     <ClCompile Include="kulka.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CarShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicalObject.h">
@@ -111,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kulka.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CarShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
