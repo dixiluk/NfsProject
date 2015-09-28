@@ -82,6 +82,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="CarShader.cpp" />
+    <ClCompile Include="CheckPoint.cpp" />
     <ClCompile Include="CrashReporter.cpp" />
     <ClCompile Include="DynamicObject.cpp" />
     <ClCompile Include="Engine.cpp" />
@@ -89,7 +90,7 @@
     <ClCompile Include="kulka.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelObject.cpp" />
-    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="StaticObject.cpp" />
@@ -104,6 +105,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Car.h" />
     <ClInclude Include="CarShader.h" />
+    <ClInclude Include="CheckPoint.h" />
     <ClInclude Include="CrashReporter.h" />
     <ClInclude Include="DynamicObject.h" />
     <ClInclude Include="Engine.h" />
@@ -112,7 +114,7 @@
     <ClInclude Include="kulka.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelObject.h" />
-    <ClInclude Include="Scene.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="StaticObject.h" />
     <ClInclude Include="Structure.h" />

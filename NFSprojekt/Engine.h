@@ -1,6 +1,6 @@
 #pragma once
 #include "Environment.h"
-#include "Scene.h"
+#include "Level.h"
 
 
 class Engine
@@ -17,15 +17,15 @@ public:
 
 	} resolution;
 
-	std::list<Scene*> scenes;
-	Scene* activeScene;
+	std::list<Level*> scenes;
+	Level* activeLevel;
 
 	PFNGLWINDOWPOS2IPROC glWindowPos2i;
 
 	static Engine* Instance;
 
 	bool keyboard[255];
-
+	bool pause;
 	short gearboxUpKey;
 	short gearboxDownKey;
 	short moveCameraKey;

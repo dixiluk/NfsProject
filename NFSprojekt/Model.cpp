@@ -14,10 +14,10 @@ Model::Model(char* name)
 	std::string path = MODELS_SUBDIR + std::string(name);
 	if (!lImporter->Initialize(path.c_str(), -1, lSdkManager->GetIOSettings()))
 		TriggerCrash("Nie można znaleźć modelu!");
-	FbxScene* lScene = FbxScene::Create(lSdkManager, "myScene");
-	lImporter->Import(lScene);
-	for (int i = 0; i < lScene->GetRootNode()->GetChildCount(); i++){
-		FbxNode* node = lScene->GetRootNode()->GetChild(i);
+	FbxScene* lLevel = FbxScene::Create(lSdkManager, "myLevel");
+	lImporter->Import(lLevel);
+	for (int i = 0; i < lLevel->GetRootNode()->GetChildCount(); i++){
+		FbxNode* node = lLevel->GetRootNode()->GetChild(i);
 		char* texBaseName = (char*)node->GetName();
 		this->objects.push_back(new ModelObject(node)); // ładowanie modeli z pliku fbx
 	}

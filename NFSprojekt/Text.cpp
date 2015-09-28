@@ -27,10 +27,15 @@ void Text::draw()
 
 Text* Text::getTextByName(std::string name)
 {
-	for (std::list<Text*>::iterator it = this->AllTexts.begin();
-		it != this->AllTexts.end(); it++){
+	for (std::list<Text*>::iterator it = Text::AllTexts.begin();
+		it != Text::AllTexts.end(); it++){
 		if ((*it)->name == name)
 			return *it;
 	}
 	return NULL;
+}
+void Text::changeValue(std::string newValue)
+{
+	this->value = newValue;
+
 }

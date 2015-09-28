@@ -10,6 +10,7 @@ Engine* Engine::Instance = nullptr;
 Engine::Engine(Resolution resolution)
 {
 	this->resolution = resolution;
+	this->pause = false;
 }
 
 
@@ -125,7 +126,7 @@ void Engine::UpdatePass()	//wykonywanie wszystkich obliczen
 
 	Camera::ActiveCamera->setupCamera();
 
-	for (GraphicalObject* obj : Engine::Instance->activeScene->graphicalObjects){
+	for (GraphicalObject* obj : Engine::Instance->activeLevel->graphicalObjects){
 		obj->compute();
 	}
 }
@@ -135,11 +136,11 @@ void Engine::RenderPass(){	//funkcja wykonania rysowania wszystich elementow
 	glClearColor(0.2, 0.2, 0.2, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (GraphicalObject* obj : Engine::Instance->activeScene->graphicalObjects){
+	for (GraphicalObject* obj : Engine::Instance->activeLevel->graphicalObjects){
 		obj->draw();
 	}
-	for (GraphicalObject* obj : Engine::Instance->activeScene->kulki){
+	for (GraphicalObject* obj : Engine::Instance->activeLevel->kulki){
 		obj->draw();
 	}
-	Engine::Instance->activeScene->kulki.clear();
+	Engine::Instance->activeLevel->kulki.clear();
 }

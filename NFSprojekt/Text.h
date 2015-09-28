@@ -9,7 +9,8 @@ public:
 
 	void compute();
 	void draw();
-	Text* getTextByName(std::string name);
+	static Text* getTextByName(std::string name);
+	void changeValue(std::string newValue);
 private:
 	std::string name;
 	std::string value;

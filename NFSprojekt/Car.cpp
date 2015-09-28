@@ -3,6 +3,8 @@
 #include "Structure.h"
 #include "Camera.h"
 #include "kulka.h"
+#include "Text.h"
+#include "CheckPoint.h"
 
 #include "StructureShader.h"
 
@@ -25,13 +27,7 @@ Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(posit
 	this->colisionPoint[5] = (glm::vec3(-carWidth / 2.0, carLength / 2.0 + 0.2, 0.3));
 	this->model = model;
 	Cars.push_back(this);
-	this->speed = 0;
-	this->rpm = 0;
-	this->gear = 1;
-	this->gearup = false;
-	this->geardown = false;
 	this->maxGear = 6;
-	this->rotationAxis = glm::vec3(1, 0, 0);
 	this->speedAt6kRps[0] = -30;
 	this->speedAt6kRps[1] = 45;
 	this->speedAt6kRps[2] = 80;
@@ -39,8 +35,10 @@ Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(posit
 	this->speedAt6kRps[4] = 150;
 	this->speedAt6kRps[5] = 180;
 	this->speedAt6kRps[6] = 220;
+	this->bestTime = 0;
 	ControledCar = this;
 	this->directionPoint = glm::vec3(0, -1, 0);
+	this->restart();
 }
 
 
@@ -252,7 +250,6 @@ void Car::compute()
 		this->gearbox();
 		this->move();
 
-		printf("Gear: %i  speed: %f  rpm: %f\n", this->gear, this->speed, this->rpm);
 		if (Engine::Instance->keyboard[100])
 		{
 			this->turn(false);
@@ -269,12 +266,58 @@ void Car::compute()
 		{
 			this->minusSpeed();
 		}
+		if (Engine::Instance->keyboard['r'])
+		{
+			this->restart();
+		}
 
+		this->displayTexts();
+
+
+
+		this->checkCheckPoint();
 
 
 	}
 }
 
+void Car::displayTexts(){
+	if (Text::getTextByName("speed") == NULL)
+		Engine::Instance->activeLevel->addGraphicalObject(new Text(glm::vec3(10, 10, 0), 0, "speed", "wartosc"));
+	char* buf = (char*) malloc(10);
+	itoa(this->speed, buf, 10);
+	Text::getTextByName("speed")->changeValue("Speed: " + std::string(buf));
+	free(buf);
+
+
+	if (Text::getTextByName("rpm") == NULL)
+		Engine::Instance->activeLevel->addGraphicalObject(new Text(glm::vec3(10, 30, 0), 0, "rpm", "wartosc"));
+	char* buf2 = (char*) malloc(10);
+	itoa(this->rpm, buf2, 10);
+	Text::getTextByName("rpm")->changeValue("RPM: " + std::string(buf2));
+	free(buf2);
+	
+	if (Text::getTextByName("gear") == NULL)
+		Engine::Instance->activeLevel->addGraphicalObject(new Text(glm::vec3(10, 50, 0), 0, "gear", "wartosc"));
+	char* buf3 = (char*) malloc(10);
+	itoa((int)(this->gear), buf3, 10);
+	Text::getTextByName("gear")->changeValue("Gear: " + std::string(buf3));
+	free(buf3);
+	
+	if (Text::getTextByName("bestTime") == NULL)
+		Engine::Instance->activeLevel->addGraphicalObject(new Text(glm::vec3(Engine::Instance->resolution.Width-150, 30, 0), 0, "bestTime", "wartosc"));
+	char* buf4 = (char*) malloc(10);
+	itoa((int) (this->bestTime), buf4, 10);
+	Text::getTextByName("bestTime")->changeValue("BestTime: " + std::string(buf4)+"s");
+	free(buf4);
+	
+	if (Text::getTextByName("Time") == NULL)
+		Engine::Instance->activeLevel->addGraphicalObject(new Text(glm::vec3(Engine::Instance->resolution.Width - 150, 10, 0), 0, "Time", "wartosc"));
+	char* buf5 = (char*) malloc(10);
+	itoa(((int) (clock() - this->startTime)/1000), buf5, 10);
+	Text::getTextByName("Time")->changeValue("Time: " + std::string(buf5)+"s");
+	free(buf5);
+}
 
 void Car::move(){
 
@@ -382,4 +425,44 @@ void Car::move(){
 }
 
 
+void Car::restart(){
 
+	this->checkPointStatus[0] = false;
+	this->checkPointStatus[1] = false;
+	this->checkPointStatus[2] = false;
+	this->checkPointStatus[3] = false;
+
+	this->rotationAxis = glm::vec3(1, 0, 2);
+	this->position = glm::vec3(210, -4.5, 175);
+	this->speed = 0;
+	this->rpm = 0;
+	this->gear = 1;
+	this->gearup = false;
+	this->geardown = false;
+	this->startTime = clock();
+
+}
+
+
+void Car::checkCheckPoint()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		if (!this->checkPointStatus[i]){
+
+			Engine::Instance->activeLevel->kulki.push_back(new kulka(Engine::Instance->activeLevel->checkPoints[i].position,new StructureShader()));
+			if (Engine::Instance->activeLevel->checkPoints[i].check(this->position))
+			{
+				this->checkPointStatus[i] = true;
+				if (i == 3){
+
+					if (this->bestTime==0)this->bestTime = this->startTime - clock();
+					if (this->bestTime>this->startTime - clock())this->bestTime = this->startTime - clock();
+					this->restart();
+				}
+			}
+			else return;
+		}
+
+	}
+}
