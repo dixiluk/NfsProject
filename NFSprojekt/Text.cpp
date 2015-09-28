@@ -1,11 +1,12 @@
 #include "Text.h"
 
+std::list<Text*> Text::AllTexts = std::list<Text*>();
 
 Text::Text(glm::vec3 position, Shader* shader, std::string name, std::string value) : GraphicalObject(position, shader)
 {
 	this->name = name;
 	this->value = value;
-	allTexts.push_back(this);
+	AllTexts.push_back(this);
 }
 
 
@@ -26,8 +27,8 @@ void Text::draw()
 
 Text* Text::getTextByName(std::string name)
 {
-	for (std::list<Text*>::iterator it = this->allTexts.begin();
-		it != this->allTexts.end(); it++){
+	for (std::list<Text*>::iterator it = this->AllTexts.begin();
+		it != this->AllTexts.end(); it++){
 		if ((*it)->name == name)
 			return *it;
 	}

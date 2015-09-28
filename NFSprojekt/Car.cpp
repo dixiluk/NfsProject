@@ -17,12 +17,12 @@ std::list<Car*> Car::Cars;
 Car* Car::ControledCar = 0;
 Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(position, shader)
 {
-	this->colisionPoint.push_back(glm::vec3(carWidth / 2.0, -carLength / 2.0, 0.3));
-	this->colisionPoint.push_back(glm::vec3(0, -carLength / 2.0-0.1, 0.3));
-	this->colisionPoint.push_back(glm::vec3(-carWidth / 2.0, -carLength / 2.0, 0.3));
-	this->colisionPoint.push_back(glm::vec3(carWidth / 2.0, carLength / 2.0+0.2, 0.3));
-	this->colisionPoint.push_back(glm::vec3(0, carLength / 2.0+0.3, 0.3));
-	this->colisionPoint.push_back(glm::vec3(-carWidth / 2.0, carLength / 2.0+0.2, 0.3));
+	this->colisionPoint[0]=(glm::vec3(carWidth / 2.0, -carLength / 2.0, 0.3));
+	this->colisionPoint[1]=(glm::vec3(0, -carLength / 2.0-0.1, 0.3));
+	this->colisionPoint[2] =(glm::vec3(-carWidth / 2.0, -carLength / 2.0, 0.3));
+	this->colisionPoint[3] = (glm::vec3(carWidth / 2.0, carLength / 2.0 + 0.2, 0.3));
+	this->colisionPoint[4] = (glm::vec3(0, carLength / 2.0 + 0.3, 0.3));
+	this->colisionPoint[5] = (glm::vec3(-carWidth / 2.0, carLength / 2.0 + 0.2, 0.3));
 	this->model = model;
 	Cars.push_back(this);
 	this->speed = 0;
@@ -178,15 +178,16 @@ void Car::addSpeed()
 }
 
 
-void Car::turn(bool site){
+bool Car::turn(bool site){
+	double tmp = this->rotationAxis.z;
 	if (this->speed <= 0){
 		if (site)
 		{
-			this->rotationAxis.z += (float) (0.006 * log(-this->speed + 1)*1.4);
+			tmp += (float) (0.006 * log(-this->speed + 1)*1.4);
 		}
 		else
 		{
-			this->rotationAxis.z -= (float) (0.006 * log(-this->speed + 1)*1.4);
+			tmp -= (float) (0.006 * log(-this->speed + 1)*1.4);
 
 		}
 	}
@@ -194,24 +195,52 @@ void Car::turn(bool site){
 	{
 		if (this->speed > 30) {
 			if (site)
-				this->rotationAxis.z += (float) (0.006 * (-log(this->speed - 20) + 7));
+				tmp += (float) (0.006 * (-log(this->speed - 20) + 7));
 			else
-				this->rotationAxis.z -= (float) (0.006 * (-log(this->speed - 20) + 7));
+				tmp -= (float) (0.006 * (-log(this->speed - 20) + 7));
 
 		}
 		else
 		{
 			if (site)
 			{
-				this->rotationAxis.z += (float) (0.006 * log(this->speed + 1)*1.4);
+				tmp += (float) (0.006 * log(this->speed + 1)*1.4);
 			}
 			else
 			{
-				this->rotationAxis.z -= (float) (0.006 * log(this->speed + 1)*1.4);
+				tmp -= (float) (0.006 * log(this->speed + 1)*1.4);
 
 			}
 		}
 	}
+	
+	glm::mat4 ModelMatrix;
+	ModelMatrix = glm::translate(glm::mat4(1.0f), (this->position));
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*this->rotationAxis.x), glm::vec3(1, 0, 0)); //Macierz modelu
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*this->rotationAxis.y), glm::vec3(0, 1, 0)); //Macierz modelu
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*tmp), glm::vec3(0, 0, 1)); //Macierz modelu
+	
+	for each (glm::vec3 var in this->colisionPoint)
+	{
+		glm::vec4 vec = this->iModelMat * glm::vec4(var, 1);
+		glm::vec3 t = glm::vec3(vec);
+
+		glm::vec4 vec2 = ModelMatrix * glm::vec4(var, 1);
+		glm::vec3 t2 = glm::vec3(vec2);
+
+		glm::vec3* tmp1 = new glm::vec3(0, 0, 0);
+		glm::vec3* tmp2 = new glm::vec3(0, 0, 0);
+
+		if (Structure::Colision(tmp1, tmp2, t, t2))
+		{
+			printf("Kolizja \n");
+			return false;
+		}
+	}
+
+	this->rotationAxis.z = tmp;
+	this->iModelMat = ModelMatrix;
+	return true;
 }
 
 
@@ -221,17 +250,9 @@ void Car::compute()
 {
 	if (ControledCar == this){
 		this->gearbox();
+		this->move();
 
 		printf("Gear: %i  speed: %f  rpm: %f\n", this->gear, this->speed, this->rpm);
-
-		if (Engine::Instance->keyboard[101])
-		{
-			this->addSpeed();
-		}
-		if (Engine::Instance->keyboard[103])
-		{
-			this->minusSpeed();
-		}
 		if (Engine::Instance->keyboard[100])
 		{
 			this->turn(false);
@@ -240,7 +261,15 @@ void Car::compute()
 		{
 			this->turn(true);
 		}
-		this->move();
+		if (Engine::Instance->keyboard[101])
+		{
+			this->addSpeed();
+		}
+		if (Engine::Instance->keyboard[103])
+		{
+			this->minusSpeed();
+		}
+
 
 
 	}
@@ -250,37 +279,104 @@ void Car::compute()
 void Car::move(){
 
 
+	glm::vec4 vec = this->iModelMat * glm::vec4(this->directionPoint, 1);
+	glm::vec3 t = (glm::vec3(vec) - this->position)*(float) (this->speed / 100);
+
+	glm::mat4 ModelMatrix;
+	ModelMatrix = glm::translate(glm::mat4(1.0f), (this->position+t));
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*this->rotationAxis.x), glm::vec3(1, 0, 0)); //Macierz modelu
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*this->rotationAxis.y), glm::vec3(0, 1, 0)); //Macierz modelu
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*this->rotationAxis.z), glm::vec3(0, 0, 1)); //Macierz modelu
+
 
 	for each (glm::vec3 var in this->colisionPoint)
 	{
 		glm::vec4 vec = this->iModelMat * glm::vec4(var, 1);
 		glm::vec3 t = glm::vec3(vec);
 
-
-		
-		glm::vec4 vec2 = this->iModelMat * glm::vec4(this->directionPoint - this->position +t , 1);
-
-		glm::vec3 t2 = (glm::vec3(vec2) - t)*(float) (this->speed / 100);
+		glm::vec4 vec2 = ModelMatrix * glm::vec4(var, 1);
+		glm::vec3 t2 = glm::vec3(vec2);
 
 		glm::vec3* tmp1 = new glm::vec3(0, 0, 0);
 		glm::vec3* tmp2 = new glm::vec3(0,0,0);
 
-		/*if (Structure::Colision(tmp1, tmp2, t, t+t2))
-			printf("Kolizja \n");*/
+		if (Structure::Colision(tmp1, tmp2, t, t2))
+		{
 
-		//Engine::Instance->activeScene->kulki.push_back(new kulka(t+t2, new StructureShader()));
+			if (this->gear > 0){
+				if (this->colisionPoint[0] == var){ // kolizja lewy przode
+					if (this->turn(true))
+					{
+						this->speed = 0.995 * this->speed;
+						this->move();
+						return;
+					}
+					else
+					{
+						this->speed = 0;
+						return;
+					}
+				}
+				if (this->colisionPoint[1] == var){// kolizja srodek przode
+					this->speed = -1 / 5 * this->speed;
+					this->move();
+					return;
+
+				}
+				if (this->colisionPoint[2] == var){// kolizja prawy przode
+					if (this->turn(false))
+					{
+						this->speed = 0.995 * this->speed;
+						this->move();
+						return;
+					}
+					else
+					{
+						this->speed = 0;
+						return;
+					}
+				}
+			}
+
+			if (this->gear == 0){
+				if (this->colisionPoint[3] == var){// kolizja lewy tyl
+					if (this->turn(false))
+					{
+						this->speed = 0.995 * this->speed;
+						this->move();
+						return;
+					}
+					else
+					{
+						this->speed = 0;
+						return;
+					}
+				}
+				if (this->colisionPoint[4] == var){// kolizja srodek tyl
+					this->speed = -1 / 3 * this->speed;
+					this->move();
+					return;
+				}
+				if (this->colisionPoint[5] == var){// kolizja prawy tyl
+					if (this->turn(true))
+					{
+						this->speed = 0.995 * this->speed;
+						this->move();
+						return;
+					}
+					else
+					{
+						this->speed = 0;
+						return;
+					}
+				}
+			}
+		}
 	}
-
-	glm::vec4 vec = this->iModelMat * glm::vec4(this->directionPoint, 1);
-	glm::vec3 t = (glm::vec3(vec) - this->position)*(float) (this->speed / 100);
-
-	Engine::Instance->activeScene->kulki.push_back(new kulka(this->position+t, new StructureShader()));
-	Engine::Instance->activeScene->kulki.push_back(new kulka(this->position+this->directionPoint, new StructureShader()));
-
-	/*if (Structure::Colision(tmp1, tmp2, this->position, this->position+t))
-		printf("Kolizja \n");*/
+	
 
 	this->position += t;
+	this->iModelMat = ModelMatrix;
 	Camera::ActiveCamera->position = this->position;
 
 }

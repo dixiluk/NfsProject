@@ -13,7 +13,7 @@ public:
 private:
 	std::string name;
 	std::string value;
-	static std::list<Text*> allTexts;
+	static std::list<Text*> AllTexts;
 
 };
 

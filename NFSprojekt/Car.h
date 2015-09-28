@@ -5,7 +5,7 @@ class Car :
 {
 public:
 	static std::list<Car*> Cars;
-	std::list<glm::vec3> colisionPoint;
+	glm::vec3 colisionPoint[6];
 
 	void draw();
 	void compute();
@@ -25,7 +25,7 @@ private:
 	void addSpeed();
 	void minusSpeed();
 	void gearbox();
-	void turn(bool site);
+	bool turn(bool site);
 
 };
 
