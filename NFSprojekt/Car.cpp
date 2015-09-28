@@ -2,7 +2,6 @@
 #include "Engine.h"
 #include "Structure.h"
 #include "Camera.h"
-#include "kulka.h"
 #include "Text.h"
 #include "CheckPoint.h"
 
@@ -350,7 +349,6 @@ void Car::move(){
 		glm::vec3* tmp2 = new glm::vec3(0,0,0);
 
 
-		//Engine::Instance->activeLevel->kulki.push_back(new kulka(t, new StructureShader()));
 
 		if (Structure::Colision(tmp1, tmp2, t, t2))
 		{

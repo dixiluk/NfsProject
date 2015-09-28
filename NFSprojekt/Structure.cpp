@@ -19,7 +19,7 @@ void Structure::draw()
 {
 	this->shader->onPrepare(this);
 
-	for (std::list<ModelObject*>::iterator it = this->model->objects.begin();
+	/*for (std::list<ModelObject*>::iterator it = this->model->objects.begin();
 		it != this->model->objects.end(); it++)
 	{
 		ModelObject* obj = *it;
@@ -29,7 +29,7 @@ void Structure::draw()
 		glBindVertexArray(obj->arrayBuffer);
 		glDrawElements(GL_TRIANGLES, obj->verticesCount, GL_UNSIGNED_INT, 0); //Rysowanie obiektu z bufora wierzchołków
 		glBindVertexArray(0);
-	}
+	}*/
 }
 
 

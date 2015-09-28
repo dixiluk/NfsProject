@@ -2,6 +2,7 @@
 #include <cmath>
 #include <stdio.h>
 #include "GraphicalObject.h"
+#include "Car.h"
 
 Camera* Camera::ActiveCamera = 0;
 
@@ -140,7 +141,15 @@ void Camera::setPerspective(GLdouble fovY, GLdouble aspectRatio, GLdouble zNear,
 
 void Camera::setupCamera()  //stworzenie macierzy widoku
 {
-	this->viewMatrix = glm::lookAt(this->position + (this->direction*10.0f),
+	if (Car::ControledCar == NULL)
+		return;
+	glm::mat4 ModelMatrix;
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0,0,0));
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*Car::ControledCar->rotationAxis.x), glm::vec3(1, 0, 0)); //Macierz modelu
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*Car::ControledCar->rotationAxis.y), glm::vec3(0, 1, 0)); //Macierz modelu
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*Car::ControledCar->rotationAxis.z), glm::vec3(0, 0, 1)); //Macierz modelu
+	glm::vec3 n = glm::vec3(ModelMatrix* glm::vec4(this->direction,1.0f));
+	this->viewMatrix = glm::lookAt(this->position + (n*10.0f),
 		this->position,
 		this->axis);
 	this->viewProjectionMatrix = this->projectionMatrix * this->viewMatrix;

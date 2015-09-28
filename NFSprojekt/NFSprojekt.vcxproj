@@ -87,7 +87,6 @@
     <ClCompile Include="DynamicObject.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GraphicalObject.cpp" />
-    <ClCompile Include="kulka.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelObject.cpp" />
     <ClCompile Include="Level.cpp" />
@@ -111,7 +110,6 @@
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Environment.h" />
     <ClInclude Include="GraphicalObject.h" />
-    <ClInclude Include="kulka.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelObject.h" />
     <ClInclude Include="Level.h" />

@@ -7,7 +7,6 @@
 #include "ModelObject.h"
 #include "StructureShader.h"
 #include "CarShader.h"
-#include "kulka.h"
 #include "Terrain.h"
 #include "Text.h"
 #include "CheckPoint.h"
@@ -19,7 +18,6 @@ int main(int argc, char * argv[])
 	Engine::Init(argc, argv);
 
 	Level* scene = new Level();
-	kulka::kulkam = new Model("kulka.fbx");
 	Engine::Instance->activeLevel = (Level*) scene;
 	Camera *camera = new Camera(glm::vec3(210, -4.5, 175));
 
