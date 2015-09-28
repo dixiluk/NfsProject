@@ -23,12 +23,12 @@ void StructureShader::onPrepare(void* ptr)
 	glUseProgram(program);
 
 	Structure* object = (Structure*)ptr;
-
+	
 	glm::mat4 ModelMatrix;
 	ModelMatrix = glm::translate(glm::mat4(1.0f), object->position);
-	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*object->rotationAxis.x), glm::vec3(1, 0, 0)); //Macierz modelu
-	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*object->rotationAxis.y), glm::vec3(0, 1, 0)); //Macierz modelu
-	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f*object->rotationAxis.z), glm::vec3(0, 0, 1)); //Macierz modelu
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f)*object->rotationAxis.x, glm::vec3(1, 0, 0)); //Macierz modelu
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f)*object->rotationAxis.y, glm::vec3(0, 1, 0)); //Macierz modelu
+	ModelMatrix = glm::rotate(ModelMatrix, (float) (-1.57079633f)*object->rotationAxis.z, glm::vec3(0, 0, 1)); //Macierz modelu
 	
 	object->iModelMat = ModelMatrix;
 

@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "Camera.h"
 #include "DynamicObject.h"
+#include "Car.h"
 
 
 
@@ -83,6 +84,19 @@ void Engine::ReshapeFunc(int width, int height)	//funkcja zmiany rozmiaru okna
 void Engine::KeyboardFunc(unsigned char key, int x, int y)
 {
 	Engine::Instance->keyboard[key] = true;
+	if (key == 'p'){
+		if (Engine::Instance->pause)
+		{
+			Engine::Instance->pause = false;
+			Car::ControledCar->startTime +=  clock() - Engine::Instance->pausetime;
+
+		}
+		else
+		{
+			Engine::Instance->pause = true;
+			Engine::Instance->pausetime = clock();
+		}
+	}
 
 }
 

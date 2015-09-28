@@ -37,7 +37,7 @@ void kulka::tworz(glm::vec3 poz){
 	if (kulka::limit > 0){
 		kulka::limit--;
 		if(tmp==NULL) tmp = new StructureShader();
-		Engine::Instance->activeLevel->kulki.push_back(new kulka(poz, tmp));
+		//Engine::Instance->activeLevel->kulki.push_back(new kulka(poz, tmp));
 	}
 
 }

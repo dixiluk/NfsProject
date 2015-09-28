@@ -6,7 +6,7 @@ class Car :
 {
 public:
 	static std::list<Car*> Cars;
-	glm::vec3 colisionPoint[6];
+	glm::vec3 colisionPoint[4];
 	bool checkPointStatus[4];
 	void draw();
 	void compute();
@@ -17,10 +17,10 @@ public:
 	void restart();
 	void displayTexts();
 	time_t startTime, bestTime;
+	static Car* ControledCar;
 private:
 	glm::vec3 directionPoint;
 	void move();
-	static Car* ControledCar;
 	double speed, rpm;
 	short gear, maxGear;
 	bool gearup, geardown;

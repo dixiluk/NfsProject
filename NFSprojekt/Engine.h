@@ -29,7 +29,7 @@ public:
 	short gearboxUpKey;
 	short gearboxDownKey;
 	short moveCameraKey;
-
+	time_t pausetime;
 	Engine(Resolution resolution);
 	~Engine();
 	static void Init(int argc, char * argv[]);

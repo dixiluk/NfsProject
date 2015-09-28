@@ -20,11 +20,9 @@ Car* Car::ControledCar = 0;
 Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(position, shader)
 {
 	this->colisionPoint[0]=(glm::vec3(carWidth / 2.0, -carLength / 2.0, 0.3));
-	this->colisionPoint[1]=(glm::vec3(0, -carLength / 2.0-0.1, 0.3));
-	this->colisionPoint[2] =(glm::vec3(-carWidth / 2.0, -carLength / 2.0, 0.3));
-	this->colisionPoint[3] = (glm::vec3(carWidth / 2.0, carLength / 2.0 + 0.2, 0.3));
-	this->colisionPoint[4] = (glm::vec3(0, carLength / 2.0 + 0.3, 0.3));
-	this->colisionPoint[5] = (glm::vec3(-carWidth / 2.0, carLength / 2.0 + 0.2, 0.3));
+	this->colisionPoint[1] =(glm::vec3(-carWidth / 2.0, -carLength / 2.0, 0.3));
+	this->colisionPoint[2] = (glm::vec3(carWidth / 2.0, carLength / 2.0 + 0.2, 0.3));
+	this->colisionPoint[3] = (glm::vec3(-carWidth / 2.0, carLength / 2.0 + 0.2, 0.3));
 	this->model = model;
 	Cars.push_back(this);
 	this->maxGear = 6;
@@ -38,6 +36,12 @@ Car::Car(glm::vec3 position, Model* model, Shader* shader) : DynamicObject(posit
 	this->bestTime = 0;
 	ControledCar = this;
 	this->directionPoint = glm::vec3(0, -1, 0);
+
+	this->checkPointStatus[0] = false;
+	this->checkPointStatus[1] = false;
+	this->checkPointStatus[2] = false;
+	this->checkPointStatus[3] = false;
+
 	this->restart();
 }
 
@@ -231,7 +235,6 @@ bool Car::turn(bool site){
 
 		if (Structure::Colision(tmp1, tmp2, t, t2))
 		{
-			printf("Kolizja \n");
 			return false;
 		}
 	}
@@ -246,37 +249,40 @@ bool Car::turn(bool site){
 
 void Car::compute()
 {
-	if (ControledCar == this){
-		this->gearbox();
-		this->move();
+	if (!Engine::Instance->pause)
+	{
+		if (ControledCar == this){
+			this->gearbox();
+			this->move();
 
-		if (Engine::Instance->keyboard[100])
-		{
-			this->turn(false);
+			if (Engine::Instance->keyboard[100])
+			{
+				this->turn(false);
+			}
+			if (Engine::Instance->keyboard[102])
+			{
+				this->turn(true);
+			}
+			if (Engine::Instance->keyboard[101])
+			{
+				this->addSpeed();
+			}
+			if (Engine::Instance->keyboard[103])
+			{
+				this->minusSpeed();
+			}
+			if (Engine::Instance->keyboard['r'])
+			{
+				this->restart();
+			}
+
+			this->displayTexts();
+			this->checkCheckPoint();
 		}
-		if (Engine::Instance->keyboard[102])
-		{
-			this->turn(true);
-		}
-		if (Engine::Instance->keyboard[101])
-		{
-			this->addSpeed();
-		}
-		if (Engine::Instance->keyboard[103])
-		{
-			this->minusSpeed();
-		}
-		if (Engine::Instance->keyboard['r'])
-		{
-			this->restart();
-		}
 
-		this->displayTexts();
-
-
-
-		this->checkCheckPoint();
-
+	}
+	else
+	{
 
 	}
 }
@@ -343,6 +349,9 @@ void Car::move(){
 		glm::vec3* tmp1 = new glm::vec3(0, 0, 0);
 		glm::vec3* tmp2 = new glm::vec3(0,0,0);
 
+
+		//Engine::Instance->activeLevel->kulki.push_back(new kulka(t, new StructureShader()));
+
 		if (Structure::Colision(tmp1, tmp2, t, t2))
 		{
 
@@ -360,13 +369,7 @@ void Car::move(){
 						return;
 					}
 				}
-				if (this->colisionPoint[1] == var){// kolizja srodek przode
-					this->speed = -1 / 5 * this->speed;
-					this->move();
-					return;
-
-				}
-				if (this->colisionPoint[2] == var){// kolizja prawy przode
+				if (this->colisionPoint[1] == var){// kolizja prawy przode
 					if (this->turn(false))
 					{
 						this->speed = 0.995 * this->speed;
@@ -382,7 +385,7 @@ void Car::move(){
 			}
 
 			if (this->gear == 0){
-				if (this->colisionPoint[3] == var){// kolizja lewy tyl
+				if (this->colisionPoint[2] == var){// kolizja lewy tyl
 					if (this->turn(false))
 					{
 						this->speed = 0.995 * this->speed;
@@ -395,12 +398,7 @@ void Car::move(){
 						return;
 					}
 				}
-				if (this->colisionPoint[4] == var){// kolizja srodek tyl
-					this->speed = -1 / 3 * this->speed;
-					this->move();
-					return;
-				}
-				if (this->colisionPoint[5] == var){// kolizja prawy tyl
+				if (this->colisionPoint[3] == var){// kolizja prawy tyl
 					if (this->turn(true))
 					{
 						this->speed = 0.995 * this->speed;
@@ -426,21 +424,21 @@ void Car::move(){
 
 
 void Car::restart(){
-
+	
 	this->checkPointStatus[0] = false;
 	this->checkPointStatus[1] = false;
 	this->checkPointStatus[2] = false;
 	this->checkPointStatus[3] = false;
 
 	this->rotationAxis = glm::vec3(1, 0, 2);
-	this->position = glm::vec3(210, -4.5, 175);
+	this->position = glm::vec3(211, -4.5, 175);
 	this->speed = 0;
 	this->rpm = 0;
 	this->gear = 1;
 	this->gearup = false;
 	this->geardown = false;
 	this->startTime = clock();
-
+	
 }
 
 
@@ -450,14 +448,14 @@ void Car::checkCheckPoint()
 	{
 		if (!this->checkPointStatus[i]){
 
-			Engine::Instance->activeLevel->kulki.push_back(new kulka(Engine::Instance->activeLevel->checkPoints[i].position,new StructureShader()));
 			if (Engine::Instance->activeLevel->checkPoints[i].check(this->position))
 			{
 				this->checkPointStatus[i] = true;
 				if (i == 3){
 
-					if (this->bestTime==0)this->bestTime = this->startTime - clock();
-					if (this->bestTime>this->startTime - clock())this->bestTime = this->startTime - clock();
+					if (this->bestTime==0)this->bestTime =  clock() - this->startTime;
+					else
+					if (this->bestTime> clock() - this->startTime)this->bestTime =  clock() - this->startTime;
 					this->restart();
 				}
 			}
