@@ -1,0 +1,17 @@
+﻿uniform sampler2D TextureMap;
+uniform sampler2D Texture[4];
+
+varying vec2 ScaledUV;
+
+void main()
+{
+	vec4 channelColor = texture2D(TextureMap, gl_TexCoord[0].st);  // Próbkowanie tekstury kanału na określonych UV
+
+	vec4 endColor = vec4(0.0,0.0,0.0,1.0);
+	
+	endColor += texture2D(Texture[0], ScaledUV)*channelColor.r;
+	endColor += texture2D(Texture[1], ScaledUV)*channelColor.g;
+	endColor += texture2D(Texture[2], ScaledUV)*channelColor.b;
+
+	gl_FragColor = endColor; // Zastosowanie koloru piksela
+  }

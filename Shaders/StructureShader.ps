@@ -1,0 +1,7 @@
+﻿uniform sampler2D DiffuseMap;
+
+void main()
+{
+	vec4 colour1 = texture2D(DiffuseMap, gl_TexCoord[0].st);  // Próbkowanie tekstury na określonych koordynantach
+	gl_FragColor = colour1; // Zastosowanie koloru piksela
+  }
